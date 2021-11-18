@@ -9,12 +9,18 @@
 	let lock;
 	let store;
 
-	onMount(() => {
+	$: isLoggedIn = store && authHelper.authenticated(store);
+
+	onMount(async () => {
 		store = window.localStorage;
+
+		await Promise.resolve();
+
+		if (isLoggedIn) {
+			window.location.href = '/admin';
+		}
 	});
 
-	$: isLoggedIn = store && authHelper.authenticated(store);
-	$: token = store && store.getItem('id_token');
 
 	const mount = () => {
 		lock = new Auth0Lock(AUTH0_CLIENT_ID, AUTH0_DOMAIN, {
@@ -34,6 +40,7 @@
 					return;
 				}
 				authHelper.login(store, authResult, profile);
+				window.location.href = '/admin';
 			});
 		});
 	};

@@ -10,11 +10,17 @@
 	let registrations = [];
 
 	$: isLoggedIn = store && authHelper.authenticated(store);
-	$: token = 'test' + Math.random() || (store && store.getItem('id_token'));
+	$: token = store && store.getItem('id_token');
 
 	onMount(async () => {
 		store = window.localStorage;
 
+		await Promise.resolve();
+		
+		if (!isLoggedIn) {
+			window.location.href = '/login';
+		}
+		
 		const res = await fetch(server + '/course/details', {
 			headers: {
 				Authorization: `Bearer ${token}`
@@ -89,7 +95,7 @@
 <br />
 <div id="columns">
 	<div id="left">
-        <h2>Courses:</h2>
+		<h2>Courses:</h2>
 		<button on:click={deleteCourse} disabled={!courseID}>Delete</button>
 		{#each courses as course}
 			<Course {course} selected={courseID === course._id} on:select={(c) => showRegistrations(c)} />
@@ -133,7 +139,7 @@
 		background: gray;
 		display: table;
 		width: 100%;
-        color: white;
+		color: white;
 	}
 
 	.waitlist {
