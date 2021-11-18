@@ -107,3 +107,30 @@ export function getAge(birthDate: Date) {
 	}
 	return differenceInYears(dayDate, birthDate);
 }
+
+
+
+export const daysOfWeek = [
+	['Sonntag', 'So'],
+	['Montag', 'Mo'],
+	['Dienstag', 'Di'],
+	['Mittwoch', 'Mi'],
+	['Donnerstag', 'Do'],
+	['Freitag', 'Fr'],
+	['Samstag', 'Sa']
+];
+
+export const monthsOfYear = [
+	['Januar', 'Jan'],
+	['Februar', 'Feb'],
+	['März', 'Mar'],
+	['April', 'Apr'],
+	['Mai', 'Mai'],
+	['Juni', 'Jun'],
+	['Juli', 'Jul'],
+	['August', 'Aug'],
+	['September', 'Sep'],
+	['Oktober', 'Okt'],
+	['November', 'Nov'],
+	['Dezember', 'Dez']
+];

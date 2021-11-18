@@ -4,11 +4,13 @@
 	import { onMount } from 'svelte';
 	import authHelper from '../helpers/auth-helper';
 	import Course from '../components/course.svelte';
+	import CourseCreator from '../components/createCourse.svelte';
 
 	let store;
 	let courses = [];
 	let courseID;
 	let registrations = [];
+	let showOverlay = false;
 
 	$: isLoggedIn = store && authHelper.authenticated(store);
 	$: token = store && store.getItem('id_token');
@@ -26,9 +28,7 @@
 
 	async function fetchCourses() {
 		const res = await fetch(server + '/course/details', {
-			headers: {
-				Authorization: `Bearer ${token}`
-			}
+			headers: { Authorization: `Bearer ${token}` }
 		}).then((r) => r.json());
 
 		courses = res.courses;
@@ -44,7 +44,6 @@
 			method: 'POST',
 			body: JSON.stringify({ id: courseID }),
 			headers: {
-				Accept: 'application/json',
 				'Content-Type': 'application/json',
 				Authorization: `Bearer ${token}`
 			}
@@ -53,30 +52,23 @@
 	}
 
 	async function deleteRegistaration(key) {
-		const res = await fetch(server + '/registration?regKey=' + key, {
+		const res = await fetch(server + '/registration?regKey=' + encodeURIComponent(key), {
 			method: 'DELETE'
 		}).then((r) => r.json());
 		await update();
 	}
 
-	async function createCourse() {
+	async function createCourse({ detail }) {
 		const res = await fetch(server + '/course/new', {
 			method: 'POST',
-			body: JSON.stringify({
-				name: 'test',
-				location: 'test',
-				spots: 4,
-				time: '20:30',
-				duration: 2,
-				date: new Date()
-			}),
+			body: JSON.stringify(detail),
 			headers: {
 				Accept: 'application/json',
 				'Content-Type': 'application/json',
 				Authorization: `Bearer ${token}`
 			}
 		}).then((r) => r.json());
-		console.log(res);
+		await update();
 	}
 
 	function format(date) {
@@ -95,11 +87,15 @@
 			showRegistrations({ detail: { course: courseID } });
 		}
 	}
+
+	function toggleOverlay() {
+		showOverlay = !showOverlay;
+	}
 </script>
 
 <div id="columns">
 	<div id="left">
-		<h2>Courses <button id="add" on:click={createCourse}>+</button></h2>
+		<h2>Courses <button id="add" on:click={toggleOverlay}>+</button></h2>
 		<button on:click={deleteCourse} disabled={!courseID}>Delete</button>
 		{#each courses as course}
 			<Course {course} selected={courseID === course._id} on:select={(c) => showRegistrations(c)} />
@@ -127,6 +123,10 @@
 		{/if}
 	</div>
 </div>
+
+{#if showOverlay}
+	<CourseCreator on:submit={createCourse} on:close={toggleOverlay} />
+{/if}
 
 <style>
 	#columns {
@@ -205,5 +205,6 @@
 		font-weight: bold;
 		font-size: 40px;
 		transform: translateY(3px);
+		cursor: pointer;
 	}
 </style>
