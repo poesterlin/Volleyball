@@ -18,6 +18,8 @@
 	$: role =
 		store && JSON.parse(localStorage.getItem('profile'))['https://ausowa.netlify.app/role'][0];
 
+	let headers = {};
+
 	onMount(async () => {
 		store = window.localStorage;
 
@@ -26,14 +28,18 @@
 		if (!isLoggedIn && !dev) {
 			window.location.href = '/login';
 		}
+
+		headers = {
+			Authorization: `Bearer ${token}`,
+			'Content-Type': 'application/json',
+			Accept: 'application/json'
+		};
 		await fetchCourses();
 	});
 
 	async function fetchCourses() {
 		loading = true;
-		const res = await fetch(server + '/course/details', {
-			headers: { Authorization: `Bearer ${token}` }
-		}).then((r) => r.json());
+		const res = await fetch(server + '/course/details', { headers }).then((r) => r.json());
 
 		courses = res.courses || [];
 		loading = false;
@@ -49,10 +55,7 @@
 		await fetch(server + '/course/delete', {
 			method: 'POST',
 			body: JSON.stringify({ id }),
-			headers: {
-				Authorization: `Bearer ${token}`,
-				'Content-Type': 'application/json'
-			}
+			headers
 		}).then((r) => r.json());
 		await update();
 		loading = false;
@@ -60,7 +63,7 @@
 
 	async function deleteRegistaration(key) {
 		loading = true;
-		const res = await fetch(server + '/registration?regKey=' + encodeURIComponent(key), {
+		await fetch(server + '/registration?regKey=' + encodeURIComponent(key), {
 			method: 'DELETE'
 		}).then((r) => r.json());
 		await update();
@@ -69,14 +72,10 @@
 
 	async function createCourse({ detail }) {
 		loading = true;
-		const res = await fetch(server + '/course/new', {
+		await fetch(server + '/course/new', {
 			method: 'POST',
 			body: JSON.stringify(detail),
-			headers: {
-				Authorization: `Bearer ${token}`,
-				Accept: 'application/json',
-				'Content-Type': 'application/json',
-			}
+			headers
 		}).then((r) => r.json());
 		await update();
 		loading = false;
@@ -171,6 +170,7 @@
 
 	#left {
 		border-right: 10px solid grey;
+		padding-right: 20px;
 	}
 
 	#right {
