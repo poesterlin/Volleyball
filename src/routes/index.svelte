@@ -19,7 +19,7 @@
 	$: canSend = !tooShortText && courseID;
 
 	function send() {
-		if (canSend) {
+		if (!canSend) {
 			triedToSend = true;
 			return;
 		}
