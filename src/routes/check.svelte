@@ -72,7 +72,7 @@
 
 <style>
 	p {
-		margin: 10vh;
+		margin: 10vh 7vh;
 		display: flex;
 		justify-content: center;
 		background: lightgray;
@@ -83,6 +83,7 @@
 		font-size: 40px;
 		line-height: 1em;
 		padding-left: 5px;
+		max-width: 47vw;
 	}
 
 	button {
@@ -121,6 +122,6 @@
 		position: fixed;
 		top: 1em;
 		left: 1em;
-        padding: 20px;
+		padding: 20px;
 	}
 </style>

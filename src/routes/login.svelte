@@ -30,26 +30,33 @@
 		lock.on('authenticated', (authResult) => {
 			lock.getUserInfo(authResult.accessToken, (error, profile) => {
 				if (error) {
+					console.error(error);
 					return;
 				}
 				authHelper.login(store, authResult, profile);
 			});
 		});
 	};
+
+	function login() {
+		lock.show();
+	}
 </script>
 
 <svelte:head>
-	<script src="https://cdn.auth0.com/js/lock/11.29.0/lock.min.js" on:load={mount}>
+	<script src="https://cdn.auth0.com/js/lock/11.31/lock.min.js" use:mount>
 	</script>
 </svelte:head>
 
-<div class="container">
-	<h2>Login</h2>
-	<div class="user-actions">
-		{#if isLoggedIn}
-			<button on:click={() => authHelper.logout(store)}>Logout</button>
-		{:else}
-			<button on:click={() => lock.show()}>Log in</button>
-		{/if}
+{#if lock}
+	<div class="container">
+		<h2>Login</h2>
+		<div class="user-actions">
+			{#if isLoggedIn}
+				<button on:click={() => authHelper.logout(store)}>Logout</button>
+			{:else}
+				<button on:click={login}>Log in</button>
+			{/if}
+		</div>
 	</div>
-</div>
+{/if}
