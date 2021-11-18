@@ -3,7 +3,6 @@
 	import { onMount } from 'svelte';
 	import authHelper from '../helpers/auth-helper';
 	import Course from '../components/course.svelte';
-	import { humanReadableDate } from '../helpers/date';
 
 	let store;
 	let courses = [];

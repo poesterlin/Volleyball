@@ -11,7 +11,7 @@
 		"format": "prettier --write --plugin-search-dir=. src"
 	},
 	"devDependencies": {
-		"@sveltejs/adapter-static": "^1.0.0-next.25",
+		"@sveltejs/adapter-static": "^1.0.0-next.21",
 		"@sveltejs/kit": "^1.0.0-next.35",
 		"@types/cookie": "^0.4.0",
 		"@types/node": "^16.11.6",

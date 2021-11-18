@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-
 	import Course from '../components/course.svelte';
 	import { server } from '../helpers/env';
+
 	let courses = [];
 	let name;
 	let triedToSend = false;
