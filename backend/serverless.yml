@@ -24,6 +24,7 @@ provider:
   runtime: nodejs14.x
   stage: production
   region: eu-central-1
+  lambdaHashingVersion: 20201221
   environment:
 
 
@@ -54,33 +55,29 @@ functions:
     events:
       - http:
           method: POST
-          path: course/new
+          path: courses
           cors: true
-          authorizer:
-            name: verify-token
-            identitySource: method.request.header.Authorization
+          authorizer: verify-token
 
   delete_courses:
     handler: courses-handler.delete
     events:
       - http:
-          method: POST
-          path: course/delete
+          method: DELETE
+          path: courses
           cors: true
-          authorizer:
-            name: verify-token
-            identitySource: method.request.header.Authorization
+          authorizer: verify-token
+
 
   detailed_courses:
     handler: courses-handler.details
     events:
       - http:
           method: GET
-          path: course/details
+          path: courses/details
           cors: true
-          authorizer:
-            name: verify-token
-            identitySource: method.request.header.Authorization
+          authorizer: verify-token
+
 
   # registrations
   get_registration:
@@ -109,13 +106,24 @@ functions:
 
 resources:
   Resources:
-    GatewayResponseDefault4XX:
+    # This response is needed for custom authorizer failures cors support ¯\_(ツ)_/¯
+    GatewayResponse:
       Type: 'AWS::ApiGateway::GatewayResponse'
       Properties:
         ResponseParameters:
           gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
-          gatewayresponse.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
-          gatewayresponse.header.Access-Control-Allow-Methods: "'GET,OPTIONS'"
-        ResponseType: DEFAULT_4XX
+          gatewayresponse.header.Access-Control-Allow-Headers: "'*'"
+        ResponseType: EXPIRED_TOKEN
         RestApiId:
           Ref: 'ApiGatewayRestApi'
+        StatusCode: '401'
+    AuthFailureGatewayResponse:
+      Type: 'AWS::ApiGateway::GatewayResponse'
+      Properties:
+        ResponseParameters:
+          gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+          gatewayresponse.header.Access-Control-Allow-Headers: "'*'"
+        ResponseType: UNAUTHORIZED
+        RestApiId:
+          Ref: 'ApiGatewayRestApi'
+        StatusCode: '401'

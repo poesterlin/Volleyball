@@ -26,9 +26,15 @@ module.exports.details = async function (event, context) {
 }
 
 module.exports.delete = async function (event, context) {
+    const id = decodeURIComponent(event.queryStringParameters.id);
+    if (!id) {
+        return respond({ message: "not found" }, 400)
+    }
     await connectDB();
-    const { id } = JSON.parse(event.body);
     const course = await Course.findById(id);
+    if (!course) {
+        return respond({ message: "not found" }, 404)
+    }
     for (const registration of course.registered) {
         await registration.delete()
     }

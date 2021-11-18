@@ -39,7 +39,7 @@
 
 	async function fetchCourses() {
 		loading = true;
-		const res = await fetch(server + '/course/details', { headers }).then((r) => r.json());
+		const res = await fetch(server + '/courses/details', { headers }).then((r) => r.json());
 
 		courses = res.courses || [];
 		loading = false;
@@ -52,11 +52,7 @@
 	}
 	async function deleteCourse(id) {
 		loading = true;
-		await fetch(server + '/course/delete', {
-			method: 'POST',
-			body: JSON.stringify({ id }),
-			headers
-		}).then((r) => r.json());
+		await fetch(server + '/courses?id=' + id, { method: 'DELETE', headers }).then((r) => r.json());
 		await update();
 		loading = false;
 	}
@@ -72,7 +68,7 @@
 
 	async function createCourse({ detail }) {
 		loading = true;
-		await fetch(server + '/course/new', {
+		await fetch(server + '/courses', {
 			method: 'POST',
 			body: JSON.stringify(detail),
 			headers
