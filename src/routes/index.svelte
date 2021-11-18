@@ -6,47 +6,50 @@
 	let courses = [];
 	let name;
 	let triedToSend = false;
-	let promise = new Promise(() => {});
+	let registration;
 	let courseID;
 	let showOverlay = false;
-	let loading = true;
+	let loading = false;
 
 	onMount(async () => {
+		await update();
+	});
+
+	async function update() {
+		loading = true;
 		const res = await fetch(server + '/courses').then((r) => r.json());
 		courses = res.courses;
 		loading = false;
-	});
+	}
 
 	const minTextLength = 4;
 	$: tooShortText = !name || name.length < minTextLength;
 	$: canSend = !tooShortText && courseID;
 
-	function send() {
+	async function send() {
 		if (!canSend) {
 			triedToSend = true;
 			return;
 		}
 		loading = true;
 
-		promise = fetch(server + '/registration', {
+		const res = await fetch(server + '/registration', {
 			method: 'POST',
 			body: JSON.stringify({ name, course: courseID }),
 			headers: {
 				Accept: 'application/json',
 				'Content-Type': 'application/json'
 			}
-		})
-			.then((j) => j.json())
-			.then((j) => {
-				localStorage.setItem('lastKey', j.registration.key);
-				showOverlay = true;
-				loading = false;
-				return j.registration;
-			});
+		}).then((j) => j.json());
+
+		localStorage.setItem('lastKey', res.registration.key);
+		registration = res.registration;
+
+		await update();
+		showOverlay = true;
 	}
 
 	function isEnter(e) {
-		promise = undefined;
 		if (e.key === 'Enter') {
 			send();
 		}
@@ -87,16 +90,14 @@
 		<label for="name">Name too short!</label>
 	{/if}
 	<button on:click={send} class:disabled={!canSend}>Register</button>
-	{#await promise then value}
-		{#if value && showOverlay}
-			<div id="overlay" on:click={(showOverlay = false)}>
-				<p>
-					Registration Code: <b>{value.key}</b>
-					<button on:click={() => copy(value.key)}>Copy</button>
-				</p>
-			</div>
-		{/if}
-	{/await}
+	{#if registration && showOverlay}
+		<div id="overlay" on:click={() => (showOverlay = false)}>
+			<p>
+				Registration Code: <b>{registration.key}</b>
+				<button on:click={() => copy(registration.key)}>Copy</button>
+			</p>
+		</div>
+	{/if}
 </main>
 
 <style type="text/scss">
