@@ -35,7 +35,7 @@
 			headers: { Authorization: `Bearer ${token}` }
 		}).then((r) => r.json());
 
-		courses = res.courses;
+		courses = res.courses || [];
 		loading = false;
 	}
 
@@ -50,8 +50,8 @@
 			method: 'POST',
 			body: JSON.stringify({ id }),
 			headers: {
-				'Content-Type': 'application/json',
-				Authorization: `Bearer ${token}`
+				Authorization: `Bearer ${token}`,
+				'Content-Type': 'application/json'
 			}
 		}).then((r) => r.json());
 		await update();
@@ -73,9 +73,9 @@
 			method: 'POST',
 			body: JSON.stringify(detail),
 			headers: {
+				Authorization: `Bearer ${token}`,
 				Accept: 'application/json',
 				'Content-Type': 'application/json',
-				Authorization: `Bearer ${token}`
 			}
 		}).then((r) => r.json());
 		await update();

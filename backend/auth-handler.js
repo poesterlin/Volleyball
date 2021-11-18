@@ -6,20 +6,17 @@ const jwt = require('jsonwebtoken');
 const AUTH0_CLIENT_ID = process.env.auth_client;
 const AUTH0_CLIENT_PUBLIC_KEY = process.env.AUTH0_CLIENT_PUBLIC_KEY;
 
-// Policy helper function
 const generatePolicy = (principalId, effect, resource) => {
-  const authResponse = {};
-  authResponse.principalId = principalId;
+  const authResponse = { principalId };
   if (effect && resource) {
-    const policyDocument = {};
-    policyDocument.Version = '2012-10-17';
-    policyDocument.Statement = [];
-    const statementOne = {};
-    statementOne.Action = 'execute-api:Invoke';
-    statementOne.Effect = effect;
-    statementOne.Resource = resource;
-    policyDocument.Statement[0] = statementOne;
-    authResponse.policyDocument = policyDocument;
+    authResponse.policyDocument = {
+      Version: '2012-10-17',
+      Statement: [{
+        Action: 'execute-api:Invoke',
+        Effect: effect,
+        Resource: resource
+      }]
+    };
   }
   return authResponse;
 };
@@ -30,16 +27,17 @@ module.exports.auth = (event, _context, callback) => {
     return callback('Unauthorized');
   }
 
+  console.log('method', event.methodArn);
+
   const tokenParts = event.authorizationToken.split(' ');
   const tokenValue = tokenParts[1];
 
+  // no auth token!
   if (!(tokenParts[0].toLowerCase() === 'bearer' && tokenValue)) {
-    // no auth token!
     return callback('Unauthorized');
   }
-  const options = {
-    audience: AUTH0_CLIENT_ID,
-  };
+
+  const options = { audience: AUTH0_CLIENT_ID };
 
   try {
     jwt.verify(tokenValue, AUTH0_CLIENT_PUBLIC_KEY, options, (verifyError, decoded) => {
@@ -49,6 +47,7 @@ module.exports.auth = (event, _context, callback) => {
         console.log(`Token invalid. ${verifyError}`);
         return callback('Unauthorized');
       }
+
       console.log(decoded);
       const roles = decoded['https://ausowa.netlify.app/role'];
 
@@ -56,6 +55,7 @@ module.exports.auth = (event, _context, callback) => {
         console.log('valid from customAuthorizer', decoded.email);
         return callback(null, generatePolicy(decoded.sub, 'Allow', event.methodArn));
       }
+
       return callback('Unauthorized');
     });
   } catch (err) {
