@@ -8,6 +8,7 @@
 	let triedToSend = false;
 	let promise = new Promise(() => {});
 	let courseID;
+	let showOverlay = false;
 
 	onMount(async () => {
 		const res = await fetch(server + '/courses').then((r) => r.json());
@@ -34,6 +35,7 @@
 			.then((j) => j.json())
 			.then((j) => {
 				localStorage.setItem('lastKey', j.registration.key);
+				showOverlay = true;
 				return j.registration;
 			});
 	}
@@ -47,6 +49,7 @@
 
 	function copy(string) {
 		navigator.clipboard.writeText(string);
+		showOverlay = false;
 	}
 </script>
 
@@ -75,8 +78,8 @@
 	{/if}
 	<button on:click={send} class:disabled={!canSend}>Register</button>
 	{#await promise then value}
-		{#if value}
-			<div id="overlay" on:click={(value = undefined)}>
+		{#if value && showOverlay}
+			<div id="overlay" on:click={(showOverlay = false)}>
 				<p>
 					Registration Code: <b>{value.key}</b>
 					<button on:click={() => copy(value.key)}>Copy</button>
