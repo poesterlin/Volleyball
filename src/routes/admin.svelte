@@ -15,6 +15,8 @@
 
 	$: isLoggedIn = store && authHelper.authenticated(store);
 	$: token = store && store.getItem('id_token');
+	$: role =
+		store && JSON.parse(localStorage.getItem('profile'))['https://ausowa.netlify.app/role'][0];
 
 	onMount(async () => {
 		store = window.localStorage;
@@ -109,6 +111,8 @@
 		<div class="lds-dual-ring" />
 	</div>
 {/if}
+
+<span class="gray"> &nbsp; Logged in as {role}</span>
 
 <div id="columns">
 	<div id="left">
