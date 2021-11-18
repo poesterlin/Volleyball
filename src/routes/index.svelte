@@ -93,6 +93,10 @@
 	{#if registration && showOverlay}
 		<div id="overlay" on:click={() => (showOverlay = false)}>
 			<p>
+				{#if registration.waitlist}
+					<b>You are on the waitlist. Check your registration status again later.</b>
+					<br>
+				{/if}
 				Registration Code: <b>{registration.key}</b>
 				<button on:click={() => copy(registration.key)}>Copy</button>
 			</p>
