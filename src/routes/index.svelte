@@ -9,10 +9,12 @@
 	let promise = new Promise(() => {});
 	let courseID;
 	let showOverlay = false;
+	let loading = true;
 
 	onMount(async () => {
 		const res = await fetch(server + '/courses').then((r) => r.json());
 		courses = res.courses;
+		loading = false;
 	});
 
 	const minTextLength = 4;
@@ -24,6 +26,8 @@
 			triedToSend = true;
 			return;
 		}
+		loading = true;
+
 		promise = fetch(server + '/registration', {
 			method: 'POST',
 			body: JSON.stringify({ name, course: courseID }),
@@ -36,6 +40,7 @@
 			.then((j) => {
 				localStorage.setItem('lastKey', j.registration.key);
 				showOverlay = true;
+				loading = false;
 				return j.registration;
 			});
 	}
@@ -53,6 +58,11 @@
 	}
 </script>
 
+{#if loading}
+	<div id="overlay">
+		<div class="lds-dual-ring" />
+	</div>
+{/if}
 <h1>🏐 Register for Volleyball 🏐</h1>
 <div id="links">
 	<a href="/check">Check Registration</a>
@@ -166,5 +176,43 @@
 	p {
 		background: white;
 		padding: 60px;
+	}
+
+	div#overlay {
+		position: fixed;
+		top: 0;
+		bottom: 0;
+		right: 0;
+		left: 0;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		background: rgba(0, 0, 0, 0.267);
+		z-index: 100;
+	}
+
+	.lds-dual-ring {
+		display: inline-block;
+		width: 80px;
+		height: 80px;
+	}
+	.lds-dual-ring:after {
+		content: ' ';
+		display: block;
+		width: 64px;
+		height: 64px;
+		margin: 8px;
+		border-radius: 50%;
+		border: 6px solid #fff;
+		border-color: #fff transparent #fff transparent;
+		animation: lds-dual-ring 1.2s linear infinite;
+	}
+	@keyframes lds-dual-ring {
+		0% {
+			transform: rotate(0deg);
+		}
+		100% {
+			transform: rotate(360deg);
+		}
 	}
 </style>
