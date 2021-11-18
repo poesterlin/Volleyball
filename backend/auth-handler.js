@@ -26,7 +26,6 @@ const generatePolicy = (principalId, effect, resource) => {
 
 // Reusable Authorizer function, set on `authorizer` field in serverless.yml
 module.exports.auth = (event, _context, callback) => {
-  return callback(null, generatePolicy('1234', 'Allow', event.methodArn))
   if (!event.authorizationToken) {
     return callback('Unauthorized');
   }
