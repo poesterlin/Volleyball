@@ -134,7 +134,7 @@
 		flex-wrap: wrap;
 		justify-content: center;
 		width: 90vw;
-		margin: auto;
+		margin: 10vw auto;
 	}
 
 	#left,
@@ -150,6 +150,10 @@
 	#right {
 		padding: 20px;
 		display: table;
+	}
+
+	table {
+		width: 100%;
 	}
 
 	.waitlist {
