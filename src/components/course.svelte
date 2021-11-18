@@ -5,6 +5,7 @@
 
 	export let course;
 	export let selected;
+	export let deletable = false;
 </script>
 
 <div on:click={() => dispatch('select', { course: course._id })} class:selected>
@@ -14,6 +15,9 @@
 	<span>Slots filled: {course.registered.length}/{course.spots}</span>
 	<span>Duration: {course.duration} hours</span>
 	<span>Location: {course.location}</span>
+	{#if deletable}
+		<button on:click={() => dispatch('delete')}>Delete</button>
+	{/if}
 </div>
 
 <style>

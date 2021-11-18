@@ -39,10 +39,10 @@
 		const course = courses.find((c) => c._id === courseID);
 		registrations = course.registered;
 	}
-	async function deleteCourse() {
+	async function deleteCourse(id) {
 		await fetch(server + '/course/delete', {
 			method: 'POST',
-			body: JSON.stringify({ id: courseID }),
+			body: JSON.stringify({ id }),
 			headers: {
 				'Content-Type': 'application/json',
 				Authorization: `Bearer ${token}`
@@ -96,9 +96,14 @@
 <div id="columns">
 	<div id="left">
 		<h2>Courses <button id="add" on:click={toggleOverlay}>+</button></h2>
-		<button on:click={deleteCourse} disabled={!courseID}>Delete</button>
 		{#each courses as course}
-			<Course {course} selected={courseID === course._id} on:select={(c) => showRegistrations(c)} />
+			<Course
+				{course}
+				selected={courseID === course._id}
+				on:select={(c) => showRegistrations(c)}
+				on:delete={() => deleteCourse(course._id)}
+				deletable
+			/>
 		{/each}
 	</div>
 	<div id="right">
