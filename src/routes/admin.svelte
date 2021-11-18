@@ -1,4 +1,5 @@
 <script>
+	import { dev } from '$app/env';
 	import { server } from '../helpers/env';
 	import { onMount } from 'svelte';
 	import authHelper from '../helpers/auth-helper';
@@ -16,11 +17,11 @@
 		store = window.localStorage;
 
 		await Promise.resolve();
-		
-		if (!isLoggedIn) {
+
+		if (!isLoggedIn && !dev) {
 			window.location.href = '/login';
 		}
-		
+
 		const res = await fetch(server + '/course/details', {
 			headers: {
 				Authorization: `Bearer ${token}`
@@ -90,9 +91,6 @@
 
 <h2>Courses:</h2>
 <button on:click={createCourse}>create course</button>
-<br />
-<br />
-<br />
 <div id="columns">
 	<div id="left">
 		<h2>Courses:</h2>
@@ -125,21 +123,25 @@
 <style>
 	#columns {
 		display: flex;
-		justify-content: space-between;
-		gap: 10px;
+		flex-wrap: wrap;
+		justify-content: center;
+		width: 90vw;
+		margin: auto;
 	}
 
 	#left,
 	#right {
-		flex: 1 1 calc(50% - 6px);
+		flex: 1 1 500px;
+		max-width: 500px;
+	}
+
+	#left {
+		border-right: 10px solid grey;
 	}
 
 	#right {
 		padding: 20px;
-		background: gray;
 		display: table;
-		width: 100%;
-		color: white;
 	}
 
 	.waitlist {
@@ -147,7 +149,6 @@
 	}
 
 	.registration {
-		color: white;
 		display: table-row;
 		outline: 1px solid black;
 	}
@@ -169,5 +170,12 @@
 
 	.gray {
 		color: #272727;
+	}
+
+	b {
+		white-space: nowrap;
+		max-width: 20%;
+		overflow: hidden; 
+		text-overflow: ellipsis;
 	}
 </style>
