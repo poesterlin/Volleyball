@@ -200,6 +200,7 @@
 		border: 0;
 		height: 80%;
 		cursor: pointer;
+		letter-spacing: 0.5px;
 	}
 
 	.gray {

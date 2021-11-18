@@ -33,6 +33,7 @@
 		padding: 5%;
 		margin: 5px;
 		border: 1px solid rgb(240, 240, 240);
+		position: relative;
 	}
 
 	span:not(#right) {
@@ -41,5 +42,19 @@
 
 	#right {
 		float: right;
+	}
+
+	button {
+		position: absolute;
+		bottom: 2em;
+		right: 4ch;
+		background: black;
+		color: #fff;
+		border: 0;
+		height: 2em;
+		cursor: pointer;
+		font-weight: bold;
+		letter-spacing: 0.5px;
+		padding: 0 25px;
 	}
 </style>
