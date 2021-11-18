@@ -1,0 +1,121 @@
+org: philipoe
+app: paymentlambda
+# Welcome to Serverless!
+#
+# This file is the main config file for your service.
+# It's very minimal at this point and uses default values.
+# You can always add more config options for more control.
+# We've included some commented out config examples here.
+# Just uncomment any of them to get that config option.
+#
+# For full config options, check the docs:
+#    docs.serverless.com
+#
+# Happy Coding!
+
+service: Volleyball
+
+# You can pin your service to only deploy with a specific Serverless version
+# Check out our docs for more details
+# frameworkVersion: "=X.X.X"
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  stage: production
+  region: eu-central-1
+  environment:
+
+
+# you can add packaging information here
+package:
+  include:
+    - config/**
+    - node_modules/**
+  exclude:
+    - package.json
+
+functions:
+  # auth
+  verify-token:
+    handler: auth-handler.auth
+
+  # courses
+  get_courses:
+    handler: courses-handler.get
+    events:
+      - http:
+          method: GET
+          path: courses
+          cors: true
+
+  new_course:
+    handler: courses-handler.create
+    events:
+      - http:
+          method: POST
+          path: course/new
+          cors: true
+          authorizer:
+            name: verify-token
+            identitySource: method.request.header.Authorization
+
+  delete_courses:
+    handler: courses-handler.delete
+    events:
+      - http:
+          method: POST
+          path: course/delete
+          cors: true
+          authorizer:
+            name: verify-token
+            identitySource: method.request.header.Authorization
+
+  detailed_courses:
+    handler: courses-handler.details
+    events:
+      - http:
+          method: GET
+          path: course/details
+          cors: true
+          authorizer:
+            name: verify-token
+            identitySource: method.request.header.Authorization
+
+  # registrations
+  get_registration:
+    handler: registration-handler.get
+    events:
+      - http:
+          method: GET
+          path: registration
+          cors: true
+
+  cancel_registration:
+    handler: registration-handler.cancel
+    events:
+      - http:
+          method: DELETE
+          path: registration
+          cors: true
+
+  create_registration:
+    handler: registration-handler.create
+    events:
+      - http:
+          method: POST
+          path: registration
+          cors: true
+
+resources:
+  Resources:
+    GatewayResponseDefault4XX:
+      Type: 'AWS::ApiGateway::GatewayResponse'
+      Properties:
+        ResponseParameters:
+          gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+          gatewayresponse.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+          gatewayresponse.header.Access-Control-Allow-Methods: "'GET,OPTIONS'"
+        ResponseType: DEFAULT_4XX
+        RestApiId:
+          Ref: 'ApiGatewayRestApi'
