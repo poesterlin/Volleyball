@@ -21,7 +21,10 @@
 		if (!isLoggedIn && !dev) {
 			window.location.href = '/login';
 		}
+		await fetchCourses();
+	});
 
+	async function fetchCourses() {
 		const res = await fetch(server + '/course/details', {
 			headers: {
 				Authorization: `Bearer ${token}`
@@ -29,7 +32,7 @@
 		}).then((r) => r.json());
 
 		courses = res.courses;
-	});
+	}
 
 	function showRegistrations({ detail }) {
 		courseID = detail.course;
@@ -37,7 +40,7 @@
 		registrations = course.registered;
 	}
 	async function deleteCourse() {
-		const res = await fetch(server + '/course/delete', {
+		await fetch(server + '/course/delete', {
 			method: 'POST',
 			body: JSON.stringify({ id: courseID }),
 			headers: {
@@ -46,13 +49,14 @@
 				Authorization: `Bearer ${token}`
 			}
 		}).then((r) => r.json());
-		console.log(res);
+		await update();
 	}
+
 	async function deleteRegistaration(key) {
 		const res = await fetch(server + '/registration?regKey=' + key, {
 			method: 'DELETE'
 		}).then((r) => r.json());
-		console.log(res);
+		await update();
 	}
 
 	async function createCourse() {
@@ -83,17 +87,19 @@
 			hour: 'numeric'
 		}).format(new Date(date));
 	}
+
+	async function update() {
+		await fetchCourses();
+
+		if (courseID) {
+			showRegistrations({ detail: { course: courseID } });
+		}
+	}
 </script>
 
-{#if !isLoggedIn}
-	<a href="/login">Login first</a>
-{/if}
-
-<h2>Courses:</h2>
-<button on:click={createCourse}>create course</button>
 <div id="columns">
 	<div id="left">
-		<h2>Courses:</h2>
+		<h2>Courses <button id="add" on:click={createCourse}>+</button></h2>
 		<button on:click={deleteCourse} disabled={!courseID}>Delete</button>
 		{#each courses as course}
 			<Course {course} selected={courseID === course._id} on:select={(c) => showRegistrations(c)} />
@@ -101,19 +107,21 @@
 	</div>
 	<div id="right">
 		{#if registrations}
-			<h2>Registrations:</h2>
-			{#each registrations as reg}
-				<div class="registration" class:waitlist={reg.waitlist}>
-					<span><b>{reg.name}</b></span>
-					<span>{format(reg.registered)}</span>
-					<span class="gray">{reg.key}</span>
-					<span>
-						<button class="registrationButton" on:click={() => deleteRegistaration(reg.key)}
-							>Cancel</button
-						></span
-					>
-				</div>
-			{/each}
+			<h2>Registrations</h2>
+			<table>
+				{#each registrations as reg}
+					<div class="registration" class:waitlist={reg.waitlist}>
+						<span><b>{reg.name}</b></span>
+						<span>{format(reg.registered)}</span>
+						<span class="gray">{reg.key}</span>
+						<span>
+							<button class="registrationButton" on:click={() => deleteRegistaration(reg.key)}
+								>Cancel</button
+							></span
+						>
+					</div>
+				{/each}
+			</table>
 		{:else}
 			Select a course.
 		{/if}
@@ -175,7 +183,27 @@
 	b {
 		white-space: nowrap;
 		max-width: 20%;
-		overflow: hidden; 
+		overflow: hidden;
 		text-overflow: ellipsis;
+	}
+
+	h2 {
+		display: flex;
+		gap: 10px;
+		margin-top: 30px;
+		align-items: center;
+		justify-content: space-around;
+	}
+
+	#add {
+		border: 0;
+		background: cadetblue;
+		border-radius: 50%;
+		line-height: 0.9em;
+		width: 1em;
+		color: white;
+		font-weight: bold;
+		font-size: 40px;
+		transform: translateY(3px);
 	}
 </style>
