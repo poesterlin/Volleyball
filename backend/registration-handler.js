@@ -51,7 +51,7 @@ module.exports.create = async function (event, context) {
     // TODO: change encoding to base64url
     const key = Buffer.from(randomUUID(), "hex").toString("base64").replace(/=/gm, "");
 
-    const registration = await new Registration({ registered: new Date(), name, waitlist: registeredCourse.spots < registeredCourse.registered.length - 1, key, _course: registeredCourse._id }).save();
+    const registration = await new Registration({ registered: new Date(), name, waitlist: registeredCourse.spots < registeredCourse.registered.length - 2, key, _course: registeredCourse._id }).save();
     registeredCourse.registered.push(registration._id)
     await registeredCourse.save();
     return respond({ registration });

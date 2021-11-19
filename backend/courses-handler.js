@@ -60,7 +60,7 @@ module.exports.create = async function (event, context) {
             console.log(reg);
             await reg.delete();
         }
-        course.delete();
+        await course.delete();
     }
 
     return respond({ message: "created" });
