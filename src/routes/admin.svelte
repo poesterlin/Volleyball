@@ -165,6 +165,10 @@
 		flex-wrap: wrap;
 		padding: 10px;
 	}
+	#header > button {
+		border: 0;
+	}
+
 	#columns {
 		display: flex;
 		flex-wrap: wrap;

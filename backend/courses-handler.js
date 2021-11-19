@@ -35,11 +35,9 @@ module.exports.delete = async function (event, context) {
     if (!course) {
         return respond({ message: "not found" }, 404)
     }
-    for (const registration of course.registered) {
-        await registration.delete()
-    }
-    await course.delete();
-    return respond({ message: "deleted" });
+    await Registration.deleteMany({ _id: course.registered.map(r => r._id) });
+    await Course.findByIdAndDelete(course._id);
+    return respond({ message: "deleted", event });
 }
 
 module.exports.create = async function (event, context) {
@@ -55,12 +53,9 @@ module.exports.create = async function (event, context) {
     const yesterday = new Date(new Date().setDate(new Date().getDate() - 1));
     const courses = await Course.find({ date: { $lte: yesterday } }).sort({ date: 1 }).populate('registered');
 
-    for (const course of courses) {
-        for (const reg of course.registered) {
-            console.log(reg);
-            await reg.delete();
-        }
-        await course.delete();
+    if (courses.length > 0) {
+        await Registration.deleteMany({ _id: courses.flatMap((c) => c.registered).map(r => r._id) });
+        await Course.deleteMany({ _id: courses.map(r => r._id) });
     }
 
     return respond({ message: "created" });
