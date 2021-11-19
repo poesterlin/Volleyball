@@ -42,20 +42,22 @@
 		<p>
 			<label for="duration">Duration</label>
 			<input
-			type="number"
-			bind:value={course.duration}
-			step="0.25"
-			placeholder="Duration"
-			id="duration"
+				type="number"
+				bind:value={course.duration}
+				step="0.25"
+				placeholder="Duration"
+				id="duration"
 			/>
 		</p>
 		<p>
 			<label for="time">Time</label>
-			<input type="number" bind:value={course.time} placeholder="Time" id="time" />
+			<input type="text" bind:value={course.time} placeholder="Time" id="time" />
 		</p>
 		<Datepicker
 			{daysOfWeek}
 			{monthsOfYear}
+			start={new Date()}
+			startOfWeekIndex={1}
 			bind:selected={course.date}
 			format={humanReadableDate}
 		/>
