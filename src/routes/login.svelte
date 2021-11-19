@@ -21,9 +21,12 @@
 		}
 	});
 
-
-	const mount = () => {
-		lock = new Auth0Lock(AUTH0_CLIENT_ID, AUTH0_DOMAIN, {
+	async function mount() {
+		await new Promise((res) => setTimeout(res, 500));
+		if (!window.Auth0Lock) {
+			return;
+		}
+		lock = new window.Auth0Lock(AUTH0_CLIENT_ID, AUTH0_DOMAIN, {
 			auth: {
 				params: {
 					scope: 'openid email'
@@ -43,7 +46,7 @@
 				window.location.href = '/admin';
 			});
 		});
-	};
+	}
 
 	function login() {
 		lock.show();

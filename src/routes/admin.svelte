@@ -107,7 +107,11 @@
 	</div>
 {/if}
 
-<span class="gray"> &nbsp; Logged in as {role}</span>
+<div id="header">
+	<a href="/"> &lt; back</a>
+	<a href="/login">Logout</a>
+	<span class="gray"> &nbsp; Logged in as {role} </span>
+</div>
 
 <div id="columns">
 	<div id="left">
@@ -150,6 +154,12 @@
 {/if}
 
 <style>
+	#header {
+		display: flex;
+		justify-content: space-between;
+		flex-wrap: wrap;
+		padding: 10px;
+	}
 	#columns {
 		display: flex;
 		flex-wrap: wrap;
