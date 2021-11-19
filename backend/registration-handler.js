@@ -44,10 +44,9 @@ module.exports.create = async function (event, context) {
 
     // Check if name and key was submitted before
     if (lastKey) {
-        const lastReg = Registration.find({ key: lastKey, name })
+        const lastReg = await Registration.findOne({ key: lastKey, name });
         if (lastReg) {
-            lastReg.registeredTwice = true;
-            return respond({ registration: lastReg });
+            return respond({ registration: { ...lastReg.toObject(), registeredTwice: true } });
         }
     }
 
