@@ -9,6 +9,10 @@ provider:
   region: eu-central-1
   lambdaHashingVersion: 20201221
   environment:
+    AUTH0_CLIENT_PUBLIC_KEY: ${file(./config/key.pem)}
+    db_pw: ${param:db_pw} # url encode
+    db_user: ${param:db_user}
+    auth_client: ${param:auth_client}
 
 package:
   include:
