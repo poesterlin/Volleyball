@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { humanReadableDate } from '../helpers/date';
 	import { onMount } from 'svelte';
 	import Course from '../components/course.svelte';
 	import { server } from '../helpers/env';
@@ -35,7 +36,7 @@
 
 		const res = await fetch(server + '/registration', {
 			method: 'POST',
-			body: JSON.stringify({ name, course: courseID }),
+			body: JSON.stringify({ name, course: courseID, lastKey: localStorage.getItem('lastKey') }),
 			headers: {
 				Accept: 'application/json',
 				'Content-Type': 'application/json'
@@ -59,6 +60,16 @@
 		navigator.clipboard.writeText(string);
 		showOverlay = false;
 	}
+
+	function getCourseInfo() {
+		if (!courseID) {
+			return;
+		}
+
+		const { name, time, date } = courses.find((c) => c._id === courseID);
+
+		return `${name} course on ${humanReadableDate(date)} at ${time}`;
+	}
 </script>
 
 {#if loading}
@@ -72,6 +83,7 @@
 	<a href="/login">Admin</a>
 </div>
 <main>
+	<span>Please put in your name and select a course to attend.</span>
 	<input type="text" placeholder="Name" on:keyup={isEnter} name="name" bind:value={name} />
 	<div id="list">
 		{#each courses as course}
@@ -92,14 +104,23 @@
 	<button on:click={send} class:disabled={!canSend}>Register</button>
 	{#if registration && showOverlay}
 		<div id="overlay" on:click={() => (showOverlay = false)}>
-			<p>
-				{#if registration.waitlist}
-					<b>You are on the waitlist. Check your registration status again later.</b>
-					<br>
+			<div id="inner">
+				{#if registration.registeredTwice}
+					<span class="underline"> You are already registered for this course. </span>
+				{:else}
+					<h3>
+						You registered for:
+						<span class="underline">{getCourseInfo()}</span>
+					</h3>
 				{/if}
-				Registration Code: <b>{registration.key}</b>
-				<button on:click={() => copy(registration.key)}>Copy</button>
-			</p>
+				<p>
+					{#if registration.waitlist}
+						<b class="red">You are on the waitlist. Check your registration status again later.</b>
+					{/if}
+					Registration Code: <b>{registration.key}</b>
+				</p>
+				<button on:click={() => copy(registration.key)}>Copy Registration Code</button>
+			</div>
 		</div>
 	{/if}
 </main>
@@ -128,7 +149,8 @@
 		line-height: 1em;
 	}
 
-	label {
+	label,
+	.red {
 		color: red;
 	}
 
@@ -172,13 +194,22 @@
 		background: rgba(0, 0, 0, 0.267);
 	}
 
+	.underline {
+		text-decoration: underline;
+		display: block;
+		margin: 65px 0;
+		background: black;
+		color: white;
+		padding: 30px;
+	}
+
 	button.disabled {
 		border: 1px solid #999999;
 		background-color: #cccccc;
 		color: #666666;
 	}
 
-	p {
+	#inner {
 		background: white;
 		padding: 60px;
 	}

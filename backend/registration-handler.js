@@ -36,10 +36,19 @@ module.exports.cancel = async function (event, context) {
 
 module.exports.create = async function (event, context) {
     await connectDB();
-    const { name, course } = JSON.parse(event.body);
+    const { name, course, lastKey } = JSON.parse(event.body);
 
     if (![name, course].every(Boolean)) {
         return respond({ message: "error" }, 400);
+    }
+
+    // Check if name and key was submitted before
+    if (lastKey) {
+        const lastReg = Registration.find({ key: lastKey, name })
+        if (lastReg) {
+            lastReg.registeredTwice = true;
+            return respond({ registration: lastReg });
+        }
     }
 
     const registeredCourse = await Course.findById(course).exec();
@@ -52,7 +61,8 @@ module.exports.create = async function (event, context) {
     const key = Buffer.from(randomUUID(), "hex").toString("base64").replace(/=/gm, "");
 
     const registration = await new Registration({ registered: new Date(), name, waitlist: registeredCourse.spots < registeredCourse.registered.length - 2, key, _course: registeredCourse._id }).save();
-    registeredCourse.registered.push(registration._id)
+
+    registeredCourse.registered.push(registration._id);
     await registeredCourse.save();
     return respond({ registration });
 }

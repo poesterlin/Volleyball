@@ -22,7 +22,10 @@
 
 <style>
 	.selected {
-		background-color: rgb(211, 211, 211) !important;
+		color: white;
+		background-color: rgb(117, 117, 117) !important;
+		box-sizing: content-box;
+		box-shadow: 0 0 0 2px cadetblue ;
 	}
 
 	div:hover {
@@ -30,7 +33,7 @@
 	}
 
 	div {
-		padding: 5%;
+		padding: 2%;
 		margin: 5px;
 		border: 1px solid rgb(240, 240, 240);
 		position: relative;
