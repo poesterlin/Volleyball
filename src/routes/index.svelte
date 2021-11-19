@@ -81,6 +81,7 @@
 <div id="links">
 	<a href="/check">Check Registration</a>
 	<a href="/login">Admin</a>
+	<a href="https://github.com/poesterlin/Volleyball">Contribute</a>
 </div>
 <main>
 	<span>Please put in your name and select a course to attend.</span>
@@ -141,7 +142,8 @@
 		height: 70vh;
 		flex-direction: column;
 		margin: 5vh auto 0;
-		width: 70vw;
+		width: 90vw;
+		max-width: 1000px;
 	}
 
 	input {
@@ -159,7 +161,7 @@
 		overflow-y: scroll;
 		margin: 5px 0;
 		border: 1px solid gray;
-		padding: 20px;
+		padding: 2%;
 	}
 	button {
 		display: block;
