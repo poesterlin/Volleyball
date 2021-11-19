@@ -99,6 +99,11 @@
 	function toggleOverlay() {
 		showOverlay = !showOverlay;
 	}
+
+	function logout() {
+		authHelper.logout(localStorage);
+		window.location.href = '/login';
+	}
 </script>
 
 {#if loading}
@@ -109,7 +114,7 @@
 
 <div id="header">
 	<a href="/"> &lt; back</a>
-	<a href="/login">Logout</a>
+	<button on:click={logout}>Logout</button>
 	<span class="gray"> &nbsp; Logged in as {role} </span>
 </div>
 
