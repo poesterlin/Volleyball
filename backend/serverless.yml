@@ -12,6 +12,7 @@ provider:
     - Effect: Allow
       Action:
         - SES:SendTemplatedEmail
+        - SES:ListIdentities
       Resource: "*"
   environment:
     AUTH0_CLIENT_PUBLIC_KEY: ${file(./config/key.pem)}
