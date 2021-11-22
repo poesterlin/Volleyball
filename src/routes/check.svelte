@@ -3,7 +3,7 @@
 	import { page } from '$app/stores';
 	import Course from '../components/course.svelte';
 	import { server } from '../helpers/env';
-	import { goto } from '$app/navigation';
+	import { goto, prefetch } from '$app/navigation';
 
 	let key;
 	let promise;
@@ -43,6 +43,7 @@
 
 	async function cancel(key) {
 		loading = true;
+		prefetch('/');
 		const res = await fetch(server + '/registration?regKey=' + encodeURIComponent(key), {
 			method: 'DELETE',
 			headers: {
@@ -93,6 +94,9 @@
 	b {
 		display: block;
 		margin: 2em 0;
+	}
+
+	b.red {
 		color: red;
 	}
 
@@ -168,10 +172,10 @@
 				Your Registration:
 				<button on:click={() => cancel(value.key)}>Cancel Registration</button>
 			</h2>
-			{#if value.waitlist}
-				<b>Your are on the waitlist. Please check in later for updates.</b>
-			{/if}
 			<b>Name: {value.name}</b>
+			{#if value.waitlist}
+				<b class="red">Your are on the waitlist. Please check in later for updates.</b>
+			{/if}
 			Course:
 			<Course course={value._course} selected={false} />
 		{/if}
