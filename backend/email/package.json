@@ -1,0 +1,16 @@
+{
+  "name": "precompute",
+  "version": "1.0.0",
+  "description": "",
+  "main": "prerender.js",
+  "scripts": {
+    "render": "node prerender.js",
+    "start": "npm run render"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.1033.0",
+    "svelte-mail": "^0.1.1"
+  }
+}

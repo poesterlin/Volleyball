@@ -1,20 +1,12 @@
 {
-  "name": "aws-node-stripe-integration",
-  "version": "1.0.0",
-  "description": "This example for Stripe integration using AWS Lambda and API Gateway.",
-  "main": "handler.js",
-  "dependencies": {
-    "cors": "^2.8.5",
-    "js-yaml": "^3.7.0",
-    "jsonwebtoken": "^8.5.1",
-    "jwk-to-pem": "^2.0.5",
-    "mongoose": "^6.0.13",
-    "serverless-http": "^2.7.0"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "",
-  "license": "ISC",
-  "devDependencies": {}
+	"name": "aws-node-stripe-integration",
+	"version": "1.0.0",
+	"main": "handler.js",
+	"dependencies": {
+		"cors": "^2.8.5",
+		"jsonwebtoken": "^8.5.1",
+		"jwk-to-pem": "^2.0.5",
+		"mongoose": "^6.0.13"
+	},
+	"license": "ISC"
 }

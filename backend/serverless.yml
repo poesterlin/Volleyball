@@ -8,6 +8,11 @@ provider:
   stage: production
   region: eu-central-1
   lambdaHashingVersion: 20201221
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - SES:SendTemplatedEmail
+      Resource: "*"
   environment:
     AUTH0_CLIENT_PUBLIC_KEY: ${file(./config/key.pem)}
     db_pw: ${param:db_pw} # url encode
@@ -20,6 +25,7 @@ package:
     - node_modules/**
   exclude:
     - package.json
+    - email/**
 
 functions:
   # auth
@@ -53,7 +59,6 @@ functions:
           cors: true
           authorizer: verify-token
 
-
   detailed_courses:
     handler: courses-handler.details
     events:
@@ -62,7 +67,6 @@ functions:
           path: courses/details
           cors: true
           authorizer: verify-token
-
 
   # registrations
   get_registration:
@@ -92,7 +96,7 @@ functions:
 resources:
   Resources:
     GatewayResponseDefault4XX:
-      Type: 'AWS::ApiGateway::GatewayResponse'
+      Type: "AWS::ApiGateway::GatewayResponse"
       Properties:
         ResponseParameters:
           gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
@@ -100,4 +104,4 @@ resources:
           gatewayresponse.header.Access-Control-Allow-Methods: "'GET,OPTIONS,POST,DELETE'"
         ResponseType: DEFAULT_4XX
         RestApiId:
-          Ref: 'ApiGatewayRestApi'
+          Ref: "ApiGatewayRestApi"
