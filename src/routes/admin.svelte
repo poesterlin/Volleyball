@@ -1,5 +1,6 @@
 <script>
 	import { dev } from '$app/env';
+	import { goto } from '$app/navigation';
 	import { server } from '../helpers/env';
 	import { onMount } from 'svelte';
 	import authHelper from '../helpers/auth-helper';
@@ -26,7 +27,7 @@
 		await Promise.resolve();
 
 		if (!isLoggedIn && !dev) {
-			window.location.href = '/login';
+			goto('/login');
 		}
 
 		headers = {
@@ -39,7 +40,7 @@
 
 	async function fetchCourses() {
 		loading = true;
-		const res = await fetch(server + '/courses/details', { headers }).then((r) => r.json());
+		const res = await fetch(server + '/courses/details', { headers }).then(r => r.json());
 
 		courses = res.courses || [];
 		loading = false;
@@ -47,12 +48,12 @@
 
 	function showRegistrations({ detail }) {
 		courseID = detail.course;
-		const course = courses.find((c) => c._id === courseID);
+		const course = courses.find(c => c._id === courseID);
 		registrations = course.registered;
 	}
 	async function deleteCourse(id) {
 		loading = true;
-		await fetch(server + '/courses?id=' + id, { method: 'DELETE', headers }).then((r) => r.json());
+		await fetch(server + '/courses?id=' + id, { method: 'DELETE', headers }).then(r => r.json());
 		await update();
 		loading = false;
 	}
@@ -61,7 +62,7 @@
 		loading = true;
 		await fetch(server + '/registration?regKey=' + encodeURIComponent(key), {
 			method: 'DELETE'
-		}).then((r) => r.json());
+		}).then(r => r.json());
 		await update();
 		loading = false;
 	}
@@ -72,7 +73,7 @@
 			method: 'POST',
 			body: JSON.stringify(detail),
 			headers
-		}).then((r) => r.json());
+		}).then(r => r.json());
 		await update();
 		loading = false;
 	}
@@ -105,58 +106,6 @@
 		window.location.href = '/login';
 	}
 </script>
-
-{#if loading}
-	<div id="overlay">
-		<div class="lds-dual-ring" />
-	</div>
-{/if}
-
-<div id="header">
-	<a href="/"> &lt; back</a>
-	<button on:click={logout}>Logout</button>
-	<span class="gray"> &nbsp; Logged in as {role} </span>
-</div>
-
-<div id="columns">
-	<div id="left">
-		<h2>Courses <button id="add" on:click={toggleOverlay}>+</button></h2>
-		{#each courses as course}
-			<Course
-				{course}
-				selected={courseID === course._id}
-				on:select={(c) => showRegistrations(c)}
-				on:delete={() => deleteCourse(course._id)}
-				deletable
-			/>
-		{/each}
-	</div>
-	<div id="right">
-		{#if registrations}
-			<h2>Registrations</h2>
-			<table>
-				{#each registrations as reg}
-					<div class="registration" class:waitlist={reg.waitlist}>
-						<span><b>{reg.name}</b></span>
-						<span>{format(reg.registered)}</span>
-						<span class="gray">{reg.key}</span>
-						<span>
-							<button class="registrationButton" on:click={() => deleteRegistaration(reg.key)}
-								>Cancel</button
-							></span
-						>
-					</div>
-				{/each}
-			</table>
-		{:else}
-			Select a course.
-		{/if}
-	</div>
-</div>
-
-{#if showOverlay}
-	<CourseCreator on:submit={createCourse} on:close={toggleOverlay} />
-{/if}
 
 <style>
 	#header {
@@ -292,3 +241,57 @@
 		}
 	}
 </style>
+
+{#if loading}
+	<div id="overlay">
+		<div class="lds-dual-ring" />
+	</div>
+{/if}
+
+<div id="header">
+	<a href="/">&lt; back</a>
+	<button on:click={logout}>Logout</button>
+	<span class="gray">&nbsp; Logged in as {role}</span>
+</div>
+
+<div id="columns">
+	<div id="left">
+		<h2>
+			Courses
+			<button id="add" on:click={toggleOverlay}>+</button>
+		</h2>
+		{#each courses as course}
+			<Course
+				{course}
+				selected={courseID === course._id}
+				on:select={c => showRegistrations(c)}
+				on:delete={() => deleteCourse(course._id)}
+				deletable />
+		{/each}
+	</div>
+	<div id="right">
+		{#if registrations}
+			<h2>Registrations</h2>
+			<table>
+				{#each registrations as reg}
+					<div class="registration" class:waitlist={reg.waitlist}>
+						<span>
+							<b>{reg.name}</b>
+						</span>
+						<span>{format(reg.registered)}</span>
+						<span class="gray">{reg.key}</span>
+						<span>
+							<button class="registrationButton" on:click={() => deleteRegistaration(reg.key)}>
+								Cancel
+							</button>
+						</span>
+					</div>
+				{/each}
+			</table>
+		{:else}Select a course.{/if}
+	</div>
+</div>
+
+{#if showOverlay}
+	<CourseCreator on:submit={createCourse} on:close={toggleOverlay} />
+{/if}

@@ -17,7 +17,7 @@
 		await Promise.resolve();
 
 		if (isLoggedIn) {
-			window.location.href = '/admin';
+			goto('/admin');
 		}
 	});
 
