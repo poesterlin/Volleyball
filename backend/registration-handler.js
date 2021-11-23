@@ -7,8 +7,16 @@ const Course = mongoose.model('Course', new Schema({ name: String, location: Str
 module.exports.get = async function (event, context) {
     const regKey = decodeURIComponent(event.queryStringParameters.regKey);
 
+    if (!regKey) {
+        return respond({ message: "error" }, 400);
+    }
+
     await connectDB();
     const registration = await Registration.findOne({ key: regKey }).populate("_course");
+
+    if (!registration) {
+        return respond({ message: "no registration found" }, 404);
+    }
 
     return respond({ registration });
 }

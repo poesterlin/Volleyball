@@ -21,17 +21,24 @@
 			return;
 		}
 		loading = true;
-		promise = fetch(server + '/registration?regKey=' + encodeURIComponent(key), {
-			headers: {
-				Accept: 'application/json',
-				'Content-Type': 'application/json'
-			}
-		})
-			.then(j => j.json())
-			.then(j => {
-				loading = false;
-				return j.registration;
+		const fn = async () => {
+			const res = await fetch(server + '/registration?regKey=' + encodeURIComponent(key), {
+				headers: {
+					Accept: 'application/json',
+					'Content-Type': 'application/json'
+				}
 			});
+
+			loading = false;
+			if (res.ok) {
+				const resp = await res.json();
+				return resp.registration;
+			}
+
+			throw new Error();
+		};
+
+		promise = fn();
 	}
 
 	function isEnter(e) {
@@ -166,7 +173,10 @@
 	<button id="check" on:click={send}>Check</button>
 </p>
 <div id="results">
-	{#await promise then value}
+	{#await promise}
+		<h2>loading...</h2>
+	{:then value}
+		<!-- promise was fulfilled -->
 		{#if value}
 			<h2>
 				Your Registration:
@@ -179,5 +189,7 @@
 			Course:
 			<Course course={value._course} selected={false} />
 		{/if}
+	{:catch error}
+		<h2>No registration found.</h2>
 	{/await}
 </div>
