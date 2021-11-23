@@ -27,7 +27,7 @@
 		await Promise.resolve();
 
 		if (!isLoggedIn && !dev) {
-			goto('/login');
+			await goto('/login');
 		}
 
 		headers = {

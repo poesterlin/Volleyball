@@ -33,17 +33,17 @@ module.exports.sendEmail = async function (event, context) {
         }
     };
 
+    /** @type{https.RequestOptions} */
     const options = {
         'method': 'POST',
         'hostname': 'app.jetsend.com',
-        'path': '/',
+        'path': '/api/v1/transmission/email',
         'headers': {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
             'X-API-KEY': process.env.email_key,
             'Authorization': 'Bearer ' + process.env.email_key
         },
-        'maxRedirects': 20
     };
 
     await new Promise(resolve => {

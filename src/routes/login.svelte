@@ -1,6 +1,7 @@
 <script>
 	import { onMount } from 'svelte';
 	import authHelper from '../helpers/auth-helper';
+	import { goto } from '$app/navigation';
 
 	// Fill in with your values
 	const AUTH0_CLIENT_ID = 'ZIGkib3PrtAeDIPyOPshh5wVpf0gMmrZ';
@@ -17,7 +18,7 @@
 		await Promise.resolve();
 
 		if (isLoggedIn) {
-			goto('/admin');
+			await goto('/admin');
 		}
 	});
 

@@ -2,6 +2,10 @@
 	"name": "aws-node-stripe-integration",
 	"version": "1.0.0",
 	"main": "handler.js",
+	"scripts": {
+		"deploy": "sls deploy",
+		"build": "cd email && npm i && npm start"
+	},
 	"dependencies": {
 		"cors": "^2.8.5",
 		"jsonwebtoken": "^8.5.1",

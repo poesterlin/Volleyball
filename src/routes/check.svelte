@@ -59,7 +59,7 @@
 			}
 		}).then(j => j.json());
 		loading = false;
-		goto('/');
+		await goto('/');
 	}
 </script>
 
