@@ -1,38 +1,42 @@
-# create-svelte
+# Course Registration Application
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte);
+This Repo contains the code for an application created to manage registrations. It uses a serverless backend connected to a serverless MongoDB instance and a static frontend generated using SvelteKit. It has some publicly available options as well as authentication for administrators to access hidden management tools.
 
-## Creating a project
+## Development
 
-If you're seeing this, you've probably already done this step. Congrats!
-
-```bash
-# create a new project in the current directory
-npm init svelte@next
-
-# create a new project in my-app
-npm init svelte@next my-app
-```
-
-> Note: the `@next` is temporary
-
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+To start a local development version of the frontend run:
 
 ```bash
+npm install
 npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
 ```
 
-## Building
-
-Before creating a production version of your app, install an [adapter](https://kit.svelte.dev/docs#adapters) for your target environment. Then:
+To test serverless functions locally run:
 
 ```bash
+cd backend
+npm i serverless -g
+sls invoke local <function name>
+```
+
+To upload new email templates run:
+
+```bash
+cd backend
 npm run build
 ```
 
-> You can preview the built app with `npm run preview`, regardless of whether you installed an adapter. This should _not_ be used to serve your app in production.
+To deploy serverless functions run:
+
+```bash
+cd backend
+npm run deploy
+```
+
+## Frontend Architecture
+
+- `src/app.html`: base HTML config.
+- `src/components`: reusable components
+- `src/helpers`: reusable helper functions
+- `src/routes`: used for the routing of SvelteKit. Each file is exposed as an entrypoint.
+
