@@ -10,7 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "aws-sdk": "^2.1033.0",
+    "axios": "^0.24.0",
     "svelte-mail": "^0.1.1"
   }
 }

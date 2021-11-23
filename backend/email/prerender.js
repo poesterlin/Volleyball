@@ -3,14 +3,13 @@
 require('svelte/register');
 
 const { renderMail } = require('svelte-mail');
-const { readdir } = require("fs/promises");
+const { readdir, readFile } = require("fs/promises");
 const { join, sep } = require('path');
-
-const AWS = require("aws-sdk");
-AWS.config.update({ region: 'eu-central-1' });
+const { Axios } = require("axios");
 
 const dir = "./templates";
 const data = {
+    subject: "a spot opened up!",
     name: "{{name}}",
     key: "{{key}}",
     course: "{{course}}",
@@ -18,10 +17,32 @@ const data = {
     date: "{{date}}",
 }
 
-async function compute() {
-    const ses = new AWS.SES({ apiVersion: '2010-12-01' });
+/**
+ * @param {Axios} axios
+ * @param {any} template
+ * @param {boolean} update
+ */
+async function templateHandler(axios, template, update) {
+    const { statusText } = await axios.request({ method: update ? "PUT" : "POST", url: "/api/v1/email_template", data: JSON.stringify(template) })
+    console.log(statusText)
+}
 
-    const existing = (await ses.listTemplates().promise()).TemplatesMetadata.map(t => t.Name);
+
+async function compute() {
+    const { key } = JSON.parse((await readFile("config.json")).toString());
+    console.log(key)
+    const axios = new Axios({
+        baseURL: "https://app.jetsend.com",
+        headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "X-API-KEY": key,
+            Authorization: "Bearer " + key
+        }
+    });
+
+    const { data: res } = await axios.get("/api/v1/email_templates");
+    const existing = JSON.parse(res).data?.map(e => e.name) ?? [];
 
     const templates = await readdir(dir);
 
@@ -31,17 +52,17 @@ async function compute() {
         const { html, text } = await renderMail(component.default, { data });
 
         const params = {
-            TemplateName: template.replace(".svelte", ""),
-            SubjectPart: "{{subject}}",
-            HtmlPart: html,
-            TextPart: text
+            name: template,
+            email_template: {
+                name: template,
+                html,
+                text,
+                subject: "{{subject}}",
+                from_name: "Volleyball Registration Service",
+                from_email: "volleyball@oesterlin.dev",
+            }
         }
-
-        if (existing.includes(params.TemplateName)) {
-            await ses.updateTemplate({ Template: params }).promise();
-        } else {
-            await ses.createTemplate({ Template: params }).promise();
-        }
+        await templateHandler(axios, params, existing && existing.includes(params.name));
     }
 }
 
