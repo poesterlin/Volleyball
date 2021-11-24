@@ -109,7 +109,7 @@ module.exports.create = async function (event, context) {
 
     // generate registration key
     // TODO: change encoding to base64url
-    const key = Buffer.from(randomUUID(), "hex").toString("base64").replace(/=/gm, "").replace(/\s/gm, "");
+    const key = Buffer.from(randomUUID(), "hex").toString("base64").replace(/=/gm, "").replace(/+/gm, "#");
 
     const waitlist = registeredCourse.spots <= registeredCourse.registered.length;
     const registration = await new Registration({ registered: new Date(), name, waitlist, key, _course: registeredCourse._id }).save();
