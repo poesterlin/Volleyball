@@ -118,8 +118,8 @@
 						>Information is only stored until Email is send or the course is done.</label
 					>
 				</div>
-				<button id="cancel" on:click={() => cancel(value.key)}>Cancel Registration</button>
 			{/if}
+			<button id="cancel" on:click={() => cancel(value.key)}>Cancel Registration</button>
 		{/if}
 	{:catch _error}
 		<h2>No registration found.</h2>
@@ -141,7 +141,7 @@
 		gap: 10px 5px;
 		padding: 20px;
 		background: #e9e9e9;
-		margin: 4em 5px;
+		margin: 4em 5px 2em;
 	}
 
 	#email {
@@ -180,6 +180,7 @@
 	#cancel {
 		background: hsl(2, 80%, 40%);
 		height: 60px;
+		margin: 2em 5px 0;
 	}
 
 	#check {

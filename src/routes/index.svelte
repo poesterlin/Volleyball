@@ -68,7 +68,7 @@
 
 		const { name, time, date } = courses.find((c) => c._id === courseID);
 
-		return `${name} course on ${humanReadableDate(date)} at ${time}`;
+		return `${name} course, ${humanReadableDate(date)} at ${time}`;
 	}
 </script>
 
