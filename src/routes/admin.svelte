@@ -38,8 +38,8 @@
 		await fetchCourses();
 	});
 
-	async function fetchCourses() {
-		loading = true;
+	async function fetchCourses(load = true) {
+		loading = load;
 		const res = await fetch(server + '/courses/details', { headers }).then(r => r.json());
 
 		courses = res.courses || [];
@@ -50,6 +50,7 @@
 		courseID = detail.course;
 		const course = courses.find(c => c._id === courseID);
 		registrations = course.registered;
+		fetchCourses(false);
 	}
 	async function deleteCourse(id) {
 		loading = true;

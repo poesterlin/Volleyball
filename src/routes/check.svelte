@@ -42,10 +42,9 @@
 		promise = fn();
 	}
 
-	function isEnter(e) {
-		promise = undefined;
+	function isEnter(e, method = send) {
 		if (e.key === 'Enter') {
-			send();
+			method();
 		}
 	}
 
@@ -73,7 +72,7 @@
 				'Content-Type': 'application/json'
 			}
 		}).then((j) => j.json());
-		email = "registered";
+		email = 'registered';
 		loading = false;
 	}
 </script>
@@ -109,6 +108,7 @@
 						type="email"
 						name="email"
 						id="email"
+						on:keyup={(e) => isEnter(e, notify)}
 						bind:value={email}
 					/>
 
