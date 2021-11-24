@@ -63,6 +63,8 @@ module.exports.create = async function (event, context) {
         await Course.deleteMany({ _id: courses.map(r => r._id) });
     }
 
+    
+
     return respond({ message: "created" });
 }
 

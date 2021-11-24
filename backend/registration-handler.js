@@ -1,4 +1,6 @@
 // @ts-check
+const https = require('https');
+const AWS = require('aws-sdk');
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const { randomUUID } = require('crypto');
@@ -6,7 +8,6 @@ const { randomUUID } = require('crypto');
 const Registration = mongoose.model('Registration', new Schema({ registered: Date, name: String, waitlist: Boolean, key: String, email: String, _course: { type: Schema.Types.ObjectId, ref: 'Course' } }));
 // @ts-ignore
 const Course = mongoose.model('Course', new Schema({ name: String, location: String, spots: Number, time: String, duration: Number, date: Date, registered: [{ type: Schema.Types.ObjectId, ref: 'Registration' }] }));
-const https = require('https');
 
 module.exports.get = async function (event, context) {
     const regKey = decodeURIComponent(event.queryStringParameters.regKey);
@@ -66,6 +67,33 @@ module.exports.cancel = async function (event, context) {
     return respond({ message: "canceled" });
 }
 
+module.exports.trainer = async function (event, context) {
+    await connectDB();
+
+    console.log(event);
+    return true;
+}
+
+module.exports.testQueue = async function (event, context) {
+    var sqs = new AWS.SQS({ apiVersion: '2012-11-05' });
+
+    var params = {
+        DelaySeconds: 10,
+        MessageAttributes: {
+            courseID: {
+                DataType: "String",
+                StringValue: "1234"
+            },
+        },
+        MessageBody: "New Course Created",
+        QueueUrl: process.env.queue_url
+    };
+
+    const res = await sqs.sendMessage(params).promise()
+
+    return respond({ res, event });
+}
+
 module.exports.notify = async function (event, context) {
     const { key, email } = JSON.parse(event.body);
     const regex = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/;
@@ -109,7 +137,7 @@ module.exports.create = async function (event, context) {
 
     // generate registration key
     // TODO: change encoding to base64url
-    const key = Buffer.from(randomUUID(), "hex").toString("base64").replace(/=/gm, "").replace(/+/gm, "#");
+    const key = Buffer.from(randomUUID(), "hex").toString("base64").replace(/=/gm, "").replace(/\+/gm, "#");
 
     const waitlist = registeredCourse.spots + 1 <= registeredCourse.registered.length;
     const registration = await new Registration({ registered: new Date(), name, waitlist, key, _course: registeredCourse._id }).save();
