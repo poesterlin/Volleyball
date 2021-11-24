@@ -6,8 +6,8 @@ const Course = mongoose.model('Course', new Schema({ name: String, location: Str
 module.exports.get = async function (event, context) {
     await connectDB();
     const yesterday = new Date(new Date().setDate(new Date().getDate() - 1));
-    const inTwoWeeks = new Date(new Date().setDate(new Date().getDate() + 14));
-    const courses = await Course.find({ date: { $gte: yesterday, $lte: inTwoWeeks } }).sort({ date: 1 }).populate('registered');
+    const nextWeek = new Date(new Date().setDate(new Date().getDate() + 7));
+    const courses = await Course.find({ date: { $gte: yesterday, $lte: nextWeek } }).sort({ date: 1 }).populate('registered');
 
     return respond({
         courses: courses.map((c) => {
