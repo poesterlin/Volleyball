@@ -84,7 +84,7 @@
 	<a href="https://github.com/poesterlin/Volleyball">Contribute</a>
 </div>
 <main>
-	<span>Please put in your name and select a course to attend.</span>
+	<span>Put in your name and select a course to attend.</span>
 	<input type="text" placeholder="Name" on:keyup={isEnter} name="name" bind:value={name} />
 	<div id="list">
 		{#each courses as course}
@@ -114,8 +114,9 @@
 				{/if}
 				<p>
 					{#if registration.waitlist}
-						<b class="red">You are on the waitlist. Check your registration status again later.</b><br><br>
-						<span>If you want to, you can register for E-Mail updates below. </span> <br><br>
+						<b class="red">You are on the waitlist. Check your registration status again later.</b
+						><br /><br />
+						<span>If you want to, you can register for E-Mail updates below. </span> <br /><br />
 					{/if}
 					Registration Code:
 					<b>{registration.key}</b>
@@ -138,6 +139,10 @@
 		font-size: 27px;
 	}
 
+	span {
+		font-size: 20px;
+	}
+
 	main {
 		display: flex;
 		align-content: center;
@@ -146,12 +151,14 @@
 		flex-direction: column;
 		margin: 5vh auto 0;
 		width: 90vw;
-		max-width: 1000px;
+		max-width: 700px;
 	}
 
 	input {
-		font-size: 40px;
+		font-size: 30px;
 		line-height: 1em;
+		margin: 20px 0;
+		padding: 5px;
 	}
 
 	label,
