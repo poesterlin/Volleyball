@@ -81,6 +81,14 @@ functions:
           path: registration
           cors: true
 
+  notify:
+    handler: registration-handler.notify
+    events:
+      - http:
+          method: POSt
+          path: registration/notify
+          cors: true
+
   create_registration:
     handler: registration-handler.create
     events:
