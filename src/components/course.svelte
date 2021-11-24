@@ -16,10 +16,10 @@
 		<span>Registered: {course.registered.length}/{course.spots}</span>
 		<span>{course.duration} hours</span>
 		<span>{course.location}</span>
+		{#if deletable}
+			<button on:click={() => dispatch('delete')}>Delete</button>
+		{/if}
 	</div>
-	{#if deletable}
-		<button on:click={() => dispatch('delete')}>Delete</button>
-	{/if}
 </div>
 
 <style>
@@ -57,9 +57,6 @@
 	}
 
 	button {
-		position: absolute;
-		bottom: 2em;
-		right: 4ch;
 		background: black;
 		color: #fff;
 		border: 0;
