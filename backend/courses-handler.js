@@ -5,9 +5,25 @@ const Course = mongoose.model('Course', new Schema({ name: String, location: Str
 
 module.exports.get = async function (event, context) {
     await connectDB();
-    const yesterday = new Date(new Date().setDate(new Date().getDate() - 1));
-    const nextWeek = new Date(new Date().setDate(new Date().getDate() + 7));
-    const courses = await Course.find({ date: { $gte: yesterday, $lte: nextWeek } }).sort({ date: 1 }).populate('registered');
+
+    const in7Days = () => {
+        const date = new Date();
+        date.setHours(0, 0, 0, 0);
+        date.setDate(date.getDate() + 7);
+        return date;
+    }
+
+    const endOfDay = (date) => {
+        date.setHours(23, 59, 59, 999);
+        return date;
+    }
+
+    const courses = await Course.find({
+        date: {
+            $gte: in7Days(),
+            $lte: endOfDay(in7Days())
+        }
+    }).sort({ date: 1 }).populate('registered');
 
     return respond({
         courses: courses.map((c) => {
@@ -62,8 +78,6 @@ module.exports.create = async function (event, context) {
         await Registration.deleteMany({ _id: courses.flatMap((c) => c.registered).map(r => r._id) });
         await Course.deleteMany({ _id: courses.map(r => r._id) });
     }
-
-    
 
     return respond({ message: "created" });
 }

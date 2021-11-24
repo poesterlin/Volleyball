@@ -23,14 +23,14 @@ const data = {
  * @param {boolean} update
  */
 async function templateHandler(axios, template, update) {
-    const { statusText } = await axios.request({ method: update ? "PUT" : "POST", url: "/api/v1/email_template", data: JSON.stringify(template) })
-    console.log(statusText)
+    const { statusText, data: json } = await axios.request({ method: update ? "PUT" : "POST", url: "/api/v1/email_template", data: JSON.stringify(template) })
+    const { data } = JSON.parse(json);
+    console.log(data.id)
 }
 
 
 async function compute() {
-    const { key } = JSON.parse((await readFile("config.json")).toString());
-    console.log(key)
+    const { key } = JSON.parse((await readFile("./config.json")).toString());
     const axios = new Axios({
         baseURL: "https://app.jetsend.com",
         headers: {

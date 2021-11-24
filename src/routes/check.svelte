@@ -11,7 +11,7 @@
 	let email;
 
 	onMount(() => {
-		key = $page.query.get('key') || localStorage.getItem('lastKey');
+		key = $page.query.get('key') ?? localStorage.getItem('lastKey');
 		if (key) {
 			send();
 		}

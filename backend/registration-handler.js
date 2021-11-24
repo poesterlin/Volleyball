@@ -67,31 +67,96 @@ module.exports.cancel = async function (event, context) {
     return respond({ message: "canceled" });
 }
 
-module.exports.trainer = async function (event, context) {
+module.exports.registerTrainer = async function (event, context) {
     await connectDB();
 
-    console.log(event);
+    for (const record of event.Records) {
+        const attr = record.messageAttributes;
+        const courseID = attr.courseID.stringValue;
+        const trainerName = attr.trainerName.stringValue;
+        const trainerEmail = attr.trainerEmail.stringValue;
+
+        if (![courseID, trainerName, trainerEmail].every(Boolean)) {
+            continue;
+        }
+
+        const registeredCourse = await Course.findById(courseID).exec();
+        const key = Buffer.from(randomUUID(), "hex").toString("base64").replace(/=/gm, "").replace(/\+/gm, "#");
+        const waitlist = registeredCourse.spots + 1 <= registeredCourse.registered.length;
+        const registration = await new Registration({ registered: new Date(), name: trainerName, waitlist, key, _course: registeredCourse._id, email: trainerEmail }).save();
+
+        registeredCourse.registered.push(registration._id);
+        await registeredCourse.save();
+        console.log(registeredCourse)
+
+        const data = {
+            subject: "Volleyball Trainer Auto-Login",
+            name: trainerName,
+            key,
+            course: registeredCourse.name,
+            time: registeredCourse.time,
+            date: registeredCourse.date.toDateString(),
+        }
+        await sendEmail({ name: trainerName, email: trainerEmail }, "3b97f37b-a292-46f8-8a59-40f8698b2825", data);
+    }
+
     return true;
 }
 
-module.exports.testQueue = async function (event, context) {
-    var sqs = new AWS.SQS({ apiVersion: '2012-11-05' });
+module.exports.scheduleTrainer = async function (event, context) {
+    const inNDays = (n) => {
+        const date = new Date();
+        date.setHours(0, 0, 0, 0);
+        date.setDate(date.getDate() + n);
+        return date;
+    }
 
-    var params = {
-        DelaySeconds: 10,
-        MessageAttributes: {
-            courseID: {
-                DataType: "String",
-                StringValue: "1234"
+    const endOfDay = (date) => {
+        date.setHours(23, 59, 59, 999);
+        return date;
+    }
+
+    connectDB();
+
+    const coursesToday = await Course.find({
+        date: {
+            $gte: inNDays(7),
+            $lte: endOfDay(inNDays(7))
+        }
+    })
+
+    const { trainer } = JSON.parse(process.env.trainer_json);
+
+    const sqs = new AWS.SQS({ apiVersion: '2012-11-05' });
+
+    const registrations = coursesToday.flatMap(c => trainer.filter(t => t.courses.includes(c.name)).map((t) => ({ course: c, trainer: t })))
+
+    const proms = registrations.map(async (config) => {
+        const params = {
+            DelaySeconds: Math.floor(Math.random() * 15 * 60), // 15 minutes max
+            MessageAttributes: {
+                courseID: {
+                    DataType: "String",
+                    StringValue: config.course._id.toString()
+                },
+                trainerName: {
+                    DataType: "String",
+                    StringValue: config.trainer.name
+                },
+                trainerEmail: {
+                    DataType: "String",
+                    StringValue: config.trainer.email
+                },
             },
-        },
-        MessageBody: "New Course Created",
-        QueueUrl: process.env.queue_url
-    };
+            MessageBody: "Course Registrations Open",
+            QueueUrl: process.env.queue_url
+        };
+        return sqs.sendMessage(params).promise();
+    });
 
-    const res = await sqs.sendMessage(params).promise()
+    await Promise.all(proms);
 
-    return respond({ res, event });
+    return respond({ message: "created", coursesToday, trainer, registrations });
 }
 
 module.exports.notify = async function (event, context) {
@@ -169,8 +234,8 @@ function connectDB(collection = "Volleyball") {
 
 /**
  * @param {{ email: string; name: string; }} recipient
- * @param {string} [template_id]
- * @param {any} [data]
+ * @param {string} template_id
+ * @param {any} data
  */
 async function sendEmail(recipient, template_id, data) {
     const body = {

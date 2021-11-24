@@ -11,14 +11,14 @@ provider:
   iamRoleStatements:
     - Effect: Allow
       Action:
-        - SQS:DeleteMessage
-        - SQS:GetQueueAttributes
+        # - SQS:DeleteMessage
+        # - SQS:GetQueueAttributes
         - SQS:ReceiveMessage
       Resource: "*"
   environment:
     AUTH0_CLIENT_PUBLIC_KEY: ${file(./config/key.pem)}
-    trainer: ${file(./config/trainer.json)}
-    queue_url: ${param:db_pw}
+    trainer_json: ${param:trainer_json}
+    queue_url: ${param:queue_url}
     db_pw: ${param:db_pw} # url encode
     db_user: ${param:db_user}
     auth_client: ${param:auth_client}
@@ -94,7 +94,7 @@ functions:
     handler: registration-handler.notify
     events:
       - http:
-          method: POSt
+          method: POST
           path: registration/notify
           cors: true
 
@@ -106,21 +106,18 @@ functions:
           path: registration
           cors: true
 
-  test_queue:
-    handler: registration-handler.testQueue
-    events:
-      - http:
-          method: GET
-          path: registration/test
-          cors: true
-
   register_trainer:
-    handler: registration-handler.trainer
+    handler: registration-handler.registerTrainer
     events:
       - sqs:
-          arn: arn:aws:sqs:region:XXXXXX:myQueue
+          arn: ${param:queue_arn}
           batchSize: 1
           maximumBatchingWindow: 60
+  
+  every_day:
+    handler: registration-handler.scheduleTrainer
+    events:
+      - schedule: cron(0 0 * * ? *)
 
 resources:
   Resources:
