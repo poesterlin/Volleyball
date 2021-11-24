@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const Registration = mongoose.model('Registration', new Schema({ registered: Date, name: String, waitlist: Boolean, key: String, _course: { type: Schema.Types.ObjectId, ref: 'Course' } }));
+const Registration = mongoose.model('Registration', new Schema({ registered: Date, name: String, waitlist: Boolean, key: String, email: String, _course: { type: Schema.Types.ObjectId, ref: 'Course' } }));
 const Course = mongoose.model('Course', new Schema({ name: String, location: String, spots: Number, time: String, duration: Number, date: Date, registered: [{ type: Schema.Types.ObjectId, ref: 'Registration' }] }));
 
 module.exports.get = async function (event, context) {
@@ -22,7 +22,12 @@ module.exports.details = async function (event, context) {
     const yesterday = new Date(new Date().setDate(new Date().getDate() - 1));
     const courses = await Course.find({ date: { $gte: yesterday } }).sort({ date: 1 }).populate('registered');
 
-    return respond({ courses });
+    return respond({
+        courses: courses.map((c) => {
+            c.email = undefined;
+            return c;
+        })
+    });
 }
 
 module.exports.delete = async function (event, context) {

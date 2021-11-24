@@ -73,6 +73,7 @@
 				'Content-Type': 'application/json'
 			}
 		}).then((j) => j.json());
+		email = "registered";
 		loading = false;
 	}
 </script>

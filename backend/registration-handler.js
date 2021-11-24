@@ -22,7 +22,10 @@ module.exports.get = async function (event, context) {
         return respond({ message: "no registration found" }, 404);
     }
 
-    return respond({ registration });
+    const sanitized = registration.toObject();
+    sanitized.email = undefined;
+
+    return respond({ registration: sanitized });
 }
 
 module.exports.cancel = async function (event, context) {
@@ -51,7 +54,7 @@ module.exports.cancel = async function (event, context) {
                 key: nextInLine.key,
                 course: course.name,
                 time: course.time,
-                date: course.date,
+                date: course.date.toDateString(),
             }
             await sendEmail({ name: nextInLine.name, email: nextInLine.email }, "4647bb83-adb5-4547-9ff3-97ea507ac74a", data);
         }
@@ -65,8 +68,9 @@ module.exports.cancel = async function (event, context) {
 
 module.exports.notify = async function (event, context) {
     const { key, email } = JSON.parse(event.body);
+    const regex = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/;
 
-    if (![key, email].every(Boolean)) {
+    if (![key, email].every(Boolean) || !regex.test(email)) {
         return respond({ message: "error" }, 400);
     }
     await connectDB();
@@ -105,9 +109,10 @@ module.exports.create = async function (event, context) {
 
     // generate registration key
     // TODO: change encoding to base64url
-    const key = Buffer.from(randomUUID(), "hex").toString("base64").replace(/=/gm, "");
+    const key = Buffer.from(randomUUID(), "hex").toString("base64").replace(/=/gm, "").replace(/\s/gm, "");
 
-    const registration = await new Registration({ registered: new Date(), name, waitlist: registeredCourse.spots < registeredCourse.registered.length + 1, key, _course: registeredCourse._id }).save();
+    const waitlist = registeredCourse.spots <= registeredCourse.registered.length;
+    const registration = await new Registration({ registered: new Date(), name, waitlist, key, _course: registeredCourse._id }).save();
     registeredCourse.registered.push(registration._id);
 
     await registeredCourse.save();
