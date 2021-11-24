@@ -80,6 +80,8 @@ function respond(json, status = 200) {
 }
 
 function connectDB(collection = "Volleyball") {
+    if (mongoose.connection.readyState) { return; }
+
     const url = `mongodb+srv://${process.env.db_user}:${process.env.db_pw}@volleyballserverlessins.mddzc.mongodb.net/${collection}?retryWrites=true&w=majority`;
     return mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true });
 }
