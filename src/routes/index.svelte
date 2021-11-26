@@ -21,6 +21,9 @@
 		const res = await fetch(server + '/courses').then((r) => r.json());
 		courses = res.courses;
 		loading = false;
+		if (courses.length === 1) {
+			courseID = courses[0]._id;
+		}
 	}
 
 	const minTextLength = 4;
