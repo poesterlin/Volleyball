@@ -20,7 +20,7 @@ module.exports.get = async function (event, context) {
 
     const courses = await Course.find({
         date: {
-            $gte: in7Days(),
+            $gte: new Date(),
             $lte: endOfDay(in7Days())
         }
     }).sort({ date: 1 }).populate('registered');
