@@ -1,11 +1,24 @@
 // @ts-check
 const https = require('https');
-const AWS = require('aws-sdk');
+let AWS;
+try {
+    AWS = require('aws-sdk');
+} catch {
+    console.log("AWS sdk not found")
+}
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const { randomUUID } = require('crypto');
+
+const regSchema = new Schema({ registered: Date, name: String, waitlist: Boolean, key: String, email: String, _course: { type: Schema.Types.ObjectId, ref: 'Course' } });
+
+regSchema.pre('remove', { document: true, query: false }, async function () {
+    const reg = this;
+    await Course.findByIdAndUpdate(reg._course, { $pullAll: { registered: [reg._id] } });
+});
+
 // @ts-ignore
-const Registration = mongoose.model('Registration', new Schema({ registered: Date, name: String, waitlist: Boolean, key: String, email: String, _course: { type: Schema.Types.ObjectId, ref: 'Course' } }));
+const Registration = mongoose.model('Registration', regSchema);
 // @ts-ignore
 const Course = mongoose.model('Course', new Schema({ name: String, location: String, spots: Number, time: String, duration: Number, date: Date, registered: [{ type: Schema.Types.ObjectId, ref: 'Registration' }] }));
 
@@ -202,7 +215,7 @@ module.exports.create = async function (event, context) {
 
     // generate registration key
     // TODO: change encoding to base64url
-    const key = Buffer.from(randomUUID(), "hex").toString("base64").replace(/=/gm, "").replace(/\+/gm, "#");
+    const key = Buffer.from(randomUUID(), "hex").toString("base64").replace(/=/gm, "").replace(/\+/gm, "-");
 
     const waitlist = registeredCourse.spots + 1 <= registeredCourse.registered.length;
     const registration = await new Registration({ registered: new Date(), name, waitlist, key, _course: registeredCourse._id }).save();
