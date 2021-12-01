@@ -1,22 +1,13 @@
+// @ts-check
+
 const mongoose = require('mongoose');
+const { connectDB, respond, inNDays, endOfDay } = require('./helpers');
 const Schema = mongoose.Schema;
 const Registration = mongoose.model('Registration', new Schema({ registered: Date, name: String, waitlist: Boolean, key: String, email: String, _course: { type: Schema.Types.ObjectId, ref: 'Course' } }));
 const Course = mongoose.model('Course', new Schema({ name: String, location: String, spots: Number, time: String, duration: Number, date: Date, registered: [{ type: Schema.Types.ObjectId, ref: 'Registration' }] }));
 
 module.exports.get = async function (event, context) {
     await connectDB();
-
-    const inNDays = (n) => {
-        const date = new Date();
-        date.setHours(0, 0, 0, 0);
-        date.setDate(date.getDate() + n);
-        return date;
-    }
-
-    const endOfDay = (date) => {
-        date.setHours(23, 59, 59, 999);
-        return date;
-    }
 
     const courses = await Course.find({
         date: {
@@ -80,24 +71,4 @@ module.exports.create = async function (event, context) {
     }
 
     return respond({ message: "created" });
-}
-
-function respond(json, status = 200) {
-    const response = {
-        statusCode: status,
-        headers: {
-            "Access-Control-Allow-Headers": "Content-Type",
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-        },
-        body: JSON.stringify(json),
-    };
-    return response;
-}
-
-function connectDB(collection = "Volleyball") {
-    if (mongoose.connection.readyState === 1) { return; }
-
-    const url = `mongodb+srv://${process.env.db_user}:${process.env.db_pw}@volleyballserverlessins.mddzc.mongodb.net/${collection}?retryWrites=true&w=majority`;
-    return mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true });
 }
