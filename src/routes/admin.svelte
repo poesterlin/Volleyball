@@ -111,6 +111,16 @@
 		showOverlay = !showOverlay;
 	}
 
+	function copy() {
+		const course = courses.find((c) => c._id === courseID);
+		const regs = course.registered
+			.filter((r) => !r.waitlist)
+			.map((r) => r.name)
+			.sort((a, b) => a.localeCompare(b))
+			.join(',\n');
+		navigator.clipboard.writeText(regs);
+	}
+
 	function logout() {
 		authHelper.logout(localStorage);
 		goto('/login');
@@ -147,7 +157,7 @@
 	</div>
 	<div id="right">
 		{#if registrations}
-			<h2>Registrations</h2>
+			<h2>Registrations <button id="copy" on:click={copy}>Copy</button></h2>
 			<table>
 				{#each registrations as reg, idx}
 					<div class="registration" class:waitlist={reg.waitlist}>
@@ -232,7 +242,8 @@
 		height: 50px;
 	}
 
-	.registrationButton {
+	.registrationButton,
+	#copy {
 		background: black;
 		color: white;
 		border: 0;
