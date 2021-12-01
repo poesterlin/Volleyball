@@ -14,12 +14,13 @@ module.exports.get = async function (event, context) {
             $gte: inNDays(-1),
             $lte: endOfDay(inNDays(7))
         }
-    }).sort({ date: 1 }).populate('registered');
+    }).sort({ date: 1 });
 
     return respond({
         courses: courses.map((c) => {
-            c.registered = c.registered.length;
-            return c;
+            const resp = c.toObject();
+            resp.registered = resp.registered.length;
+            return resp;
         })
     });
 }
