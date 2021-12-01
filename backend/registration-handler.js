@@ -1,5 +1,4 @@
 // @ts-check
-const https = require('https');
 let AWS;
 try {
     AWS = require('aws-sdk');

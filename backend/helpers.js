@@ -1,3 +1,7 @@
+// @ts-check
+const mongoose = require('mongoose');
+const https = require('https');
+
 function respond(json, status = 200) {
     const response = {
         statusCode: status,
