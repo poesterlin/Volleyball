@@ -35,6 +35,15 @@
 			'Content-Type': 'application/json',
 			Accept: 'application/json'
 		};
+
+		const auth = await fetch(server + '/auth/check', { headers })
+			.then((res) => res.ok)
+			.catch(() => false);
+
+		if (!auth && !dev) {
+			logout();
+		}
+
 		await fetchCourses();
 	});
 
@@ -104,7 +113,7 @@
 
 	function logout() {
 		authHelper.logout(localStorage);
-		window.location.href = '/login';
+		goto('/login');
 	}
 </script>
 
