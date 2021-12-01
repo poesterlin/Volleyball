@@ -147,7 +147,11 @@
 							<b>{reg.name}</b>
 						</span>
 						<span>{format(reg.registered)}</span>
-						<span class="gray">{reg.key}</span>
+						<span class="gray">{reg.key}
+						{#if reg.email}
+							<i>✉</i>
+						{/if}
+						</span>
 						<span>
 							<button class="registrationButton" on:click={() => deleteRegistaration(reg.key)}>
 								Cancel

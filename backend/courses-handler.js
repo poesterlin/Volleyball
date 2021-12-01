@@ -40,7 +40,7 @@ module.exports.details = async function (event, context) {
 
     return respond({
         courses: courses.map((c) => {
-            c.email = undefined;
+            c.email = !!c.email;
             return c;
         })
     });
