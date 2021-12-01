@@ -36,13 +36,13 @@
 			Accept: 'application/json'
 		};
 
-		const auth = await fetch(server + '/auth/check', { headers })
-			.then((res) => res.ok)
-			.catch(() => false);
+		// const auth = await fetch(server + '/auth/check', { headers })
+		// 	.then((res) => res.ok)
+		// 	.catch(() => false);
 
-		if (!auth && !dev) {
-			logout();
-		}
+		// if (!auth && !dev) {
+		// 	logout();
+		// }
 
 		await fetchCourses();
 	});
