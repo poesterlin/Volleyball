@@ -37,6 +37,15 @@ functions:
   verify-token:
     handler: auth-handler.auth
 
+  isAuthorized:
+    handler: auth-handler.authCheck
+    events:
+      - http:
+          method: GET
+          path: auth/check
+          cors: true
+          authorizer: verify-token
+
   # courses
   get_courses:
     handler: courses-handler.get

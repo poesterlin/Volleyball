@@ -1,6 +1,7 @@
 // @ts-check
 'use strict';
 const jwt = require('jsonwebtoken');
+const { respond } = require('./helpers');
 
 // Set in `environment` of serverless.yml
 const AUTH0_CLIENT_ID = process.env.auth_client;
@@ -63,3 +64,7 @@ module.exports.auth = (event, _context, callback) => {
     return callback('Unauthorized');
   }
 };
+
+module.exports.authCheck = async function (event, _context, callback) {
+  return respond({ authorized: true });
+}
