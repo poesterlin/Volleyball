@@ -13,7 +13,7 @@
 		<b>{course.name}</b> <span id="right"> {humanReadableDate(course.date)} at {course.time}</span>
 	</h3>
 	<div class="flex">
-		<span>Registered: {course.registered.length}/{course.spots}</span>
+		<span>Registered: {#if Array.isArray(course.registered)}{course.registered.length}{:else}{course.registered}{/if}/{course.spots}</span>
 		<span>{course.duration} hours</span>
 		<span>{course.location}</span>
 		{#if deletable}
