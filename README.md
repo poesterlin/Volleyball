@@ -16,7 +16,7 @@ To test serverless functions locally run:
 ```bash
 cd backend
 npm i serverless -g
-sls invoke local <function name>
+sls invoke local -f <function name>
 ```
 
 To upload new email templates run:

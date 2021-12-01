@@ -32,8 +32,12 @@ module.exports.details = async function (event, context) {
 
     return respond({
         courses: courses.map((c) => {
-            c.email = !!c.email;
-            return c;
+            const resp = c.toObject();
+            resp.registered = resp.registered.map(e => {
+                e.email = Boolean(e.email);
+                return e;
+            });
+            return resp;
         })
     });
 }
