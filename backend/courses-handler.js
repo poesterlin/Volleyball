@@ -6,10 +6,10 @@ const Course = mongoose.model('Course', new Schema({ name: String, location: Str
 module.exports.get = async function (event, context) {
     await connectDB();
 
-    const in7Days = () => {
+    const inNDays = (n) => {
         const date = new Date();
         date.setHours(0, 0, 0, 0);
-        date.setDate(date.getDate() + 7);
+        date.setDate(date.getDate() + n);
         return date;
     }
 
@@ -20,8 +20,8 @@ module.exports.get = async function (event, context) {
 
     const courses = await Course.find({
         date: {
-            $gte: new Date(),
-            $lte: endOfDay(in7Days())
+            $gte: inNDays(-1),
+            $lte: endOfDay(inNDays(7))
         }
     }).sort({ date: 1 }).populate('registered');
 
@@ -56,7 +56,7 @@ module.exports.delete = async function (event, context) {
     if (!course) {
         return respond({ message: "not found" }, 404)
     }
-    await Registration.deleteMany({ _id: course.registered.map(r => r._id) });
+    await Registration.deleteMany({ _id: course.registered });
     await Course.findByIdAndDelete(course._id);
     return respond({ message: "deleted", event });
 }
