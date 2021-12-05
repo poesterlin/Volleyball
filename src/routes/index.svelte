@@ -1,10 +1,13 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import { humanReadableDate } from '../helpers/date';
 	import { onMount } from 'svelte';
+	import RegisteredOverlay from '../components/registeredOverlay.svelte';
 	import Course from '../components/course.svelte';
+	import Loading from '../components/loading.svelte';
 	import { server } from '../helpers/env';
 
-	let courses = [];
+	let blocks = [];
 	let name;
 	let triedToSend = false;
 	let registration;
@@ -18,11 +21,22 @@
 
 	async function update() {
 		loading = true;
-		const res = await fetch(server + '/courses').then((r) => r.json());
-		courses = res.courses;
+		let { courses: res } = await fetch(server + '/courses').then((r) => r.json());
+
+		res.forEach((course) => {
+			course.date = new Date(course.date);
+		});
+
+		const dates = (res as any[]).reduce((map, c) => map.set(c.date.toDateString()), new Map());
+
+		blocks = Array.from(dates.keys()).map((date) => ({
+			date,
+			courses: res.filter((c) => c.date.toDateString() === date)
+		}));
+
 		loading = false;
-		if (courses.length === 1) {
-			courseID = courses[0]._id;
+		if (blocks.flatMap((b) => b.courses).length === 1) {
+			courseID = blocks.flatMap((b) => b.courses)[0]._id;
 		}
 	}
 
@@ -49,8 +63,13 @@
 		localStorage.setItem('lastKey', res.registration.key);
 		registration = res.registration;
 
-		await update();
-		showOverlay = true;
+		loading = false;
+		if (registration.registeredTwice) {
+			showOverlay = true;
+			return;
+		}
+
+		goto('check');
 	}
 
 	function isEnter(e) {
@@ -58,159 +77,88 @@
 			send();
 		}
 	}
-
-	function copy(string) {
-		navigator.clipboard.writeText(string);
-		showOverlay = false;
-	}
-
-	function getCourseInfo() {
-		if (!courseID) {
-			return;
-		}
-
-		const { name, time, date } = courses.find((c) => c._id === courseID);
-
-		return `${name} course, ${humanReadableDate(date)} at ${time}`;
-	}
 </script>
 
-{#if loading}
-	<div id="overlay">
-		<div class="lds-dual-ring" />
-	</div>
-{/if}
-<h1>🏐 Register for Volleyball 🏐</h1>
-<div id="links">
-	<a href="/check" sveltekit:prefetch>Check Registration</a>
-	<a href="/login">Admin</a>
-	<a href="https://github.com/poesterlin/Volleyball">Contribute</a>
-</div>
+<Loading {loading} />
+
 <main>
-	<span>Put in your name and select a course to attend.</span>
+	{#if !canSend && triedToSend}
+		<label class="red" for="name">Name too short!</label>
+	{/if}
 	<input type="text" placeholder="Name" on:keyup={isEnter} name="name" bind:value={name} />
 	<div id="list">
-		{#each courses as course}
-			<Course
-				{course}
-				on:select={(c) => (courseID = c.detail.course)}
-				selected={course._id === courseID}
-			/>
+		{#each blocks as block}
+			<span>{humanReadableDate(block.date)}</span>
+			{#each block.courses as course}
+				<Course
+					{course}
+					on:select={(c) => (courseID = c.detail.course)}
+					selected={course._id === courseID}
+				/>
+			{/each}
 		{/each}
-
-		{#if courses.length === 0}There are currently no courses. ☹{/if}
+		{#if blocks.length === 0}There are currently no courses. ☹{/if}
 	</div>
-	{#if !canSend && triedToSend}
-		<label for="name">Name too short!</label>
-	{/if}
+
 	<button id="register" on:click={send} class:disabled={!canSend}>Register</button>
 	{#if registration && showOverlay}
-		<div id="overlay" on:click={() => (showOverlay = false)}>
-			<div id="inner">
-				{#if registration.registeredTwice}
-					<span class="underline">You are already registered for this course.</span>
-				{:else}
-					<h3>
-						You registered for:
-						<span class="underline">{getCourseInfo()}</span>
-					</h3>
-				{/if}
-				<p>
-					{#if registration.waitlist}
-						<b class="red">You are on the waitlist. Check your registration status again later.</b
-						><br /><br />
-						<span>If you want to, you can register for E-Mail updates below. </span> <br /><br />
-					{/if}
-					Registration Code:
-					<b>{registration.key}</b>
-				</p>
-				<div id="actions">
-					<button on:click={() => copy(registration.key)}>Copy Registration Code</button>
-					<a id="check" href="/check?key={registration.key}">Check Registration</a>
-				</div>
-			</div>
-		</div>
+		<RegisteredOverlay on:close={()=>showOverlay = false} {registration} />
 	{/if}
 </main>
 
-<style type="text/scss">
+<style lang="scss">
+	@use '../helpers/theme' as *;
+
 	$padding: 5px;
 
-	h1 {
-		margin-top: 2em;
-		text-align: center;
-		font-size: 27px;
-	}
-
 	span {
-		font-size: 20px;
+		font-size: 12px;
+		text-transform: capitalize;
+		margin-top: 20px;
+		display: block;
+		margin-bottom: -10px;
 	}
 
 	main {
 		display: flex;
-		align-content: center;
-		justify-content: center;
-		height: 70vh;
 		flex-direction: column;
-		margin: 5vh auto 0;
+		margin: 5vh auto;
 		width: 90vw;
 		max-width: 700px;
+		min-height: 100vh;
 	}
 
 	input {
-		font-size: 30px;
+		font-size: 20px;
 		line-height: 1em;
-		margin: 20px 0;
+		margin: 0 0 20px 0;
 		padding: 5px;
+		border-radius: 10px;
+		border: 3px solid $cAccent;
+		height: 48px;
 	}
 
-	label,
 	.red {
 		color: red;
 	}
 
 	#list {
-		height: 30vh;
-		overflow-y: scroll;
-		margin: 5px 0;
-		border: 1px solid gray;
-		padding: 2%;
+		max-height: 60vh;
+		overflow-y: auto;
+		margin-bottom: 4vh;
 	}
 
-	#actions {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		align-content: center;
-		flex-wrap: wrap;
-		gap: 10px;
-	}
-	button,
-	a#check {
+	button {
 		display: block;
 		margin: 15px auto;
-		width: 100%;
-		height: 60px;
-		background: cadetblue;
+		padding: 1em 3em;
+		background: $cAccent;
 		color: white;
 		border: 0;
-		border-radius: 15px;
+		border-radius: 80px;
 		font-weight: bold;
 		cursor: pointer;
-	}
-
-	button:not(#register) {
-		background: white;
-		color: black;
-		border: 5px solid rgba(0, 0, 0, 0.267);
-	}
-	button:not(#register),
-	a#check {
-		flex: 1 1 calc(50% - 5px);
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		font-size: 16px;
+		box-shadow: 1px 1px 8px #0000002e;
 	}
 
 	#links {
@@ -221,73 +169,11 @@
 		font-weight: bold;
 	}
 
-	#overlay {
-		position: fixed;
-		top: 0;
-		bottom: 0;
-		right: 0;
-		left: 0;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		background: rgba(0, 0, 0, 0.267);
-	}
-
-	.underline {
-		text-decoration: underline;
-		display: block;
-		margin: 65px 0;
-		background: black;
-		color: white;
-		padding: 30px;
-	}
-
 	button.disabled {
-		border: 1px solid #999999;
-		background-color: #cccccc;
-		color: #666666;
-	}
-
-	#inner {
-		background: white;
-		padding: 60px;
-	}
-
-	div#overlay {
-		position: fixed;
-		top: 0;
-		bottom: 0;
-		right: 0;
-		left: 0;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		background: rgba(0, 0, 0, 0.267);
-		z-index: 100;
-	}
-
-	.lds-dual-ring {
-		display: inline-block;
-		width: 80px;
-		height: 80px;
-	}
-	.lds-dual-ring:after {
-		content: ' ';
-		display: block;
-		width: 64px;
-		height: 64px;
-		margin: 8px;
-		border-radius: 50%;
-		border: 6px solid #fff;
-		border-color: #fff transparent #fff transparent;
-		animation: lds-dual-ring 1.2s linear infinite;
-	}
-	@keyframes lds-dual-ring {
-		0% {
-			transform: rotate(0deg);
-		}
-		100% {
-			transform: rotate(360deg);
-		}
+		border: 2px solid $c40;
+		background-color: $c100;
+		color: $c80;
+		cursor: no-drop;
+		box-shadow: unset;
 	}
 </style>

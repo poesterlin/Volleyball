@@ -1,0 +1,47 @@
+// colors
+$c0: black;
+$c20: #3b3b37;
+$c40: #4d4747;
+$c80: #d0d0d0;
+$c100: white;
+$cAccent: #21b5ac;
+$breakpoint-sm: 576px;
+$breakpoint-md: 768px;
+
+:global(.dark *) {
+	color: $c100;
+}
+
+:global(*) {
+	color: $c0;
+}
+@mixin md($mode) {
+	@include media($breakpoint-md, $mode) {
+		@content;
+	}
+}
+
+@mixin sm($mode) {
+	@include media($breakpoint-sm, $mode) {
+		@content;
+	}
+}
+
+@mixin media($breakpoint, $mode) {
+	@media screen and (#{$mode}-width: $breakpoint) {
+		@content;
+	}
+}
+
+@mixin overlay() {
+	position: fixed;
+	top: 0;
+	bottom: 0;
+	right: 0;
+	left: 0;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	background: rgba(0, 0, 0, 0.267);
+	z-index: 1000;
+}

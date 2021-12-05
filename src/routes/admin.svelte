@@ -152,6 +152,7 @@
 				on:select={(c) => showRegistrations(c)}
 				on:delete={() => deleteCourse(course._id)}
 				deletable
+				fullDate
 			/>
 		{/each}
 	</div>
@@ -166,10 +167,11 @@
 							<b>{reg.name}</b>
 						</span>
 						<span>{format(reg.registered)}</span>
-						<span class="gray">{reg.key}
-						{#if reg.email}
-							<i>✉</i>
-						{/if}
+						<span class="gray"
+							>{reg.key}
+							{#if reg.email}
+								<i>✉</i>
+							{/if}
 						</span>
 						<span>
 							<button class="registrationButton" on:click={() => deleteRegistaration(reg.key)}>

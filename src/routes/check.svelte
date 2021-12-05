@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
 	import Course from '../components/course.svelte';
+	import Loading from '../components/loading.svelte';
 	import { server } from '../helpers/env';
 	import { goto, prefetch } from '$app/navigation';
 
@@ -77,45 +78,44 @@
 	}
 </script>
 
-{#if loading}
-	<div id="overlay">
-		<div class="lds-dual-ring" />
+<Loading {loading} />
+<div id="header">
+	<div id="search">
+		<input
+			placeholder="Registration Code"
+			type="text"
+			on:keyup={isEnter}
+			name="name"
+			bind:value={key}
+		/>
+		<button id="check" on:click={send}>Check</button>
 	</div>
-{/if}
-<a href="/">&lt; back</a>
-<header>
-	<input
-		placeholder="Registration Code"
-		type="text"
-		on:keyup={isEnter}
-		name="name"
-		bind:value={key}
-	/>
-	<button id="check" on:click={send}>Check</button>
-</header>
+</div>
 <div id="results">
 	{#await promise}
 		<h2>loading...</h2>
 	{:then value}
 		{#if value}
-			<h2>Registration for {value.name}:</h2>
+			<h3>{value.name}</h3>
 			<Course course={value._course} selected={false} />
 			{#if value.waitlist}
-				<div id="emailContainer">
-					<b>Your are on the waitlist. Please check in later for updates.</b>
-					<input
-						placeholder="Submit your Email for one time updates."
-						type="email"
-						name="email"
-						id="email"
-						on:keyup={(e) => isEnter(e, notify)}
-						bind:value={email}
-					/>
+				<div id="waitlist" class="dark">
+					<b>Your are on the waitlist. Register for E-Mail Updates:</b>
+					<div id="emailContainer">
+						<input
+							placeholder="E-Mail"
+							type="email"
+							name="email"
+							id="email"
+							on:keyup={(e) => isEnter(e, notify)}
+							bind:value={email}
+						/>
 
-					<button on:click={notify}>Submit</button>
+						<button on:click={notify}>Submit</button>
+					</div>
 
 					<label for="email"
-						>Information is only stored until Email is send or the course is done.</label
+						>Information is only stored until E-Mail is send or the course is done.</label
 					>
 				</div>
 			{/if}
@@ -126,128 +126,131 @@
 	{/await}
 </div>
 
-<style>
-	#emailContainer > button {
-		background: black;
-		color: white;
-		border: 0;
-		cursor: pointer;
-		letter-spacing: 0.5px;
-		font-size: 20px;
-	}
-	#emailContainer {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 10px 5px;
-		padding: 20px;
-		background: #e9e9e9;
-		margin: 4em 5px 2em;
-	}
+<style lang="scss">
+	@use '../helpers/theme' as *;
 
-	#email {
-		flex: 1 1 calc(100% - 100px);
-		font-size: 20px;
-	}
-
-	label {
-		color: grey;
-	}
-	header {
-		margin: 10vh 0vh 3em;
-		display: flex;
-		justify-content: center;
-		background: #334d4b;
-		padding: 20px;
-		width: calc(100% - 40px);
-	}
-
-	header > input {
-		font-size: 40px;
-		line-height: 1em;
-		padding-left: 5px;
-		max-width: 47vw;
-	}
-
-	header > button,
-	#cancel {
-		background: hsl(182, 25%, 50%);
-		color: white;
-		border: 0;
+	button {
 		font-weight: bold;
 		cursor: pointer;
+		padding: 1em 3em;
 	}
+	#header {
+		padding: 5vh 0vh 1em;
+		display: flex;
+		justify-content: center;
+		width: 100%;
+		background: $c20;
+		#search {
+			display: flex;
+			background: white;
+			padding: 5px;
+			border-radius: 80px;
 
-	#cancel {
-		background: hsl(2, 80%, 40%);
-		height: 60px;
-		margin: 2em 5px 0;
-	}
+			&:focus-within {
+				box-shadow: 0px 0px 0px 3px $cAccent;
+			}
 
-	#check {
-		margin-left: 5px;
-		width: 20%;
-		min-width: max-content;
+			input {
+				font-size: 20px;
+				line-height: 1em;
+				padding-left: 5px;
+				max-width: 47vw;
+				border: 0;
+				margin-left: 1em;
+				outline: 0;
+			}
+
+			button {
+				color: $c100;
+				background: $cAccent;
+				border: 0;
+				border-radius: 80px;
+			}
+		}
 	}
 
 	#results {
-		width: 80%;
+		width: 85%;
+		max-width: 800px;
+		min-height: calc(100vh - 0px);
 		margin: auto;
-		border: 1px solid #dddddd;
 		padding: 30px;
-		box-shadow: 3px 2px 7px #d7d7d7;
-	}
-
-	b {
-		display: block;
-		color: red;
-	}
-
-	h2 {
 		display: flex;
-		justify-content: space-between;
-		align-items: stretch;
 		flex-wrap: wrap;
+		flex-direction: column;
+	}
+	h2 {
+		margin-top: 1em;
+	}
+	h3 {
+		margin-top: 2em;
 	}
 
-	a {
-		position: fixed;
-		top: 1em;
-		left: 1em;
-		padding: 20px;
-	}
-	#overlay {
-		position: fixed;
-		top: 0;
-		bottom: 0;
-		right: 0;
-		left: 0;
+	#waitlist {
 		display: flex;
+		flex-wrap: wrap;
 		justify-content: center;
-		align-items: center;
-		background: rgba(0, 0, 0, 0.267);
-	}
-	.lds-dual-ring {
-		display: inline-block;
-		width: 80px;
-		height: 80px;
-	}
-	.lds-dual-ring:after {
-		content: ' ';
-		display: block;
-		width: 64px;
-		height: 64px;
-		margin: 8px;
-		border-radius: 50%;
-		border: 6px solid #fff;
-		border-color: #fff transparent #fff transparent;
-		animation: lds-dual-ring 1.2s linear infinite;
-	}
-	@keyframes lds-dual-ring {
-		0% {
-			transform: rotate(0deg);
+		gap: 1em;
+		margin: 4vh 0 1vh;
+		background: $c40;
+		padding: 30px 1em;
+		border-radius: 10px;
+		max-width: calc(90vw - 60px);
+
+		#emailContainer {
+			flex: 1 1 80%;
+			max-width: 80%;
+			min-width: min(100%, 300px);
+			display: flex;
+			background: $c100;
+			padding: 5px;
+			border-radius: 80px;
+
+			&:focus-within {
+				box-shadow: 0px 0px 0px 3px $cAccent;
+			}
+
+			button {
+				background: black;
+				color: white;
+				border: 0;
+				cursor: pointer;
+				letter-spacing: 0.5px;
+				border-radius: 80px;
+			}
+
+			input {
+				flex: 1 1 80%;
+				border-radius: 80px;
+				border: 0;
+				margin-left: 1em;
+				outline: 0;
+				min-width: 0;
+			}
 		}
-		100% {
-			transform: rotate(360deg);
+
+		#email {
+			flex: 1 1 calc(20% - 100px);
+			font-size: 20px;
+		}
+
+		label {
+			color: $c80;
+		}
+	}
+
+	#cancel {
+		min-width: 45%;
+		margin: 5vw auto 0;
+		color: $c20;
+		background: $c100;
+		border-radius: 80px;
+		border: 1px solid $c20;
+
+		&:hover {
+			background: red;
+			border: 0;
+			color: white;
 		}
 	}
 </style>
