@@ -100,7 +100,7 @@
 			<Course course={value._course} selected={false} />
 			{#if value.waitlist}
 				<div id="waitlist" class="dark">
-					<b>Your are on the waitlist. Register for E-Mail Updates:</b>
+					<b>You are on the waitlist. Register for E-Mail Updates:</b>
 					<div id="emailContainer">
 						<input
 							placeholder="E-Mail"
