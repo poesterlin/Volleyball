@@ -14,46 +14,6 @@
 	$: firstArc = totalWidth / 2 - arcDist - arcSize;
 </script>
 
-<svelte:window bind:innerWidth />
-
-<header class="dark">
-	<a href="/">
-		<h1>Register for Volleyball</h1>
-	</a>
-	<a href="/login">
-		<img src="/Volleyball_icon.svg" alt="" />
-	</a>
-</header>
-
-<slot />
-
-{#if !segment || segment === 'check'}
-	<div>
-		<a href="/" class:active={!segment} sveltekit:prefetch
-			><svg viewBox="0 0 39 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-				<line x1="18.5001" y1="39.5002" x2="18.5001" y2="0.500183" />
-				<line x1="18.5001" y1="39.5002" x2="18.5001" y2="0.500183" />
-				<line x1="0.00012207" y1="19.0002" x2="39.0001" y2="19.0002" />
-				<line x1="0.00012207" y1="19.0002" x2="39.0001" y2="19.0002" />
-			</svg>
-		</a>
-		<a href="/check" id="check" class:active={segment === 'check'} sveltekit:prefetch
-			><svg viewBox="0 0 39 50" fill="none" xmlns="http://www.w3.org/2000/svg">
-				<circle cx="16.3222" cy="15.6797" r="15" transform="rotate(-6.47544 16.3222 15.6797)" />
-				<line x1="24.7271" y1="28.0954" x2="38.2508" y2="49.7081" />
-			</svg>
-		</a>
-		<svg
-			id="arcs"
-			viewBox="{padding} 0 {innerWidth} {height}"
-			height="{height}px"
-			width="{totalWidth}px"
-		>
-			<path d="M 0 0 h {firstArc} {arc} h {arcDist * 2} {arc} H {totalWidth} V {height} H 0" />
-		</svg>
-	</div>
-{/if}
-
 <style lang="scss">
 	@use '../helpers/theme' as *;
 	:global(body) {
@@ -112,6 +72,8 @@
 		svg {
 			stroke-width: 1px;
 			pointer-events: all;
+			fill: none;
+			height: 40px;
 		}
 	}
 
@@ -131,3 +93,41 @@
 		pointer-events: none;
 	}
 </style>
+
+<svelte:window bind:innerWidth />
+
+<header class="dark">
+	<a href="/">
+		<h1>Register for Volleyball</h1>
+	</a>
+	<a href="/login">
+		<img src="/Volleyball_icon.svg" alt="" />
+	</a>
+</header>
+
+<slot />
+
+{#if !segment || segment === 'check'}
+	<div>
+		<a href="/" class:active={!segment} sveltekit:prefetch>
+			<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+				<line x1="20" y1="40" x2="20" y2="0" />
+				<line x1="0" y1="20" x2="40" y2="20" />
+			</svg>
+		</a>
+		<a href="/check" id="check" class:active={segment === 'check'} sveltekit:prefetch>
+			<svg viewBox="0 0 40 50" xmlns="http://www.w3.org/2000/svg">
+				<circle cx="16" cy="16" r="15" />
+				<line x1="25" y1="28" x2="40" y2="50" />
+			</svg>
+		</a>
+		<svg
+			id="arcs"
+			viewBox="{padding} 0 {innerWidth}
+			{height}"
+			height="{height}px"
+			width="{totalWidth}px">
+			<path d="M 0 0 h {firstArc} {arc} h {arcDist * 2} {arc} H {totalWidth} V {height} H 0" />
+		</svg>
+	</div>
+{/if}
