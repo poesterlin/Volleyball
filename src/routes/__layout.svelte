@@ -37,7 +37,7 @@
 				<line x1="0.00012207" y1="19.0002" x2="39.0001" y2="19.0002" />
 			</svg>
 		</a>
-		<a href="check" id="check" class:active={segment === 'check'} sveltekit:prefetch
+		<a href="/check" id="check" class:active={segment === 'check'} sveltekit:prefetch
 			><svg viewBox="0 0 39 50" fill="none" xmlns="http://www.w3.org/2000/svg">
 				<circle cx="16.3222" cy="15.6797" r="15" transform="rotate(-6.47544 16.3222 15.6797)" />
 				<line x1="24.7271" y1="28.0954" x2="38.2508" y2="49.7081" />
