@@ -1,0 +1,17 @@
+{
+    "name": "HTWG Volleyball Registration",
+    "short_name": "HTWG Volleyball",
+    "theme_color": "#21b5ac",
+    "background_color": "#3b3b37",
+    "display": "standalone",
+    "orientation": "portrait",
+    "scope": "/",
+    "start_url": "/",
+    "icons": [
+        {
+          "src": "/favicon.png",
+          "type": "image/png",
+          "sizes": "144x144"
+        }
+    ]
+}
