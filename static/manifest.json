@@ -13,5 +13,10 @@
           "type": "image/png",
           "sizes": "144x144"
         }
+    ],
+    "url_handlers": [
+      {
+        "origin": "https://volleyballhtwg.netlify.app"
+      }
     ]
 }
