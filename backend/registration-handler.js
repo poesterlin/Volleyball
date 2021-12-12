@@ -58,7 +58,7 @@ module.exports.cancel = async function (event, context) {
 
     const course = await Course.findById(registration._course._id).populate("registered");
     const nextInLine = course.registered.filter(f => f.waitlist).sort((a, b) => new Date(b.date) - new Date(a.date))[0];
-    if (nextInLine) {
+    if (nextInLine && !registration.waitlist) {
         nextInLine.waitlist = false;
 
         if (nextInLine.email) {
