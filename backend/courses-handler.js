@@ -51,9 +51,11 @@ module.exports.delete = async function (event, context) {
     if (!course) {
         return respond({ message: "not found" }, 404)
     }
-    await Registration.deleteMany({ _id: course.registered });
+    if (course.registered.length > 0) {
+        await Registration.deleteMany({ _id: { $in: course.registered } });
+    }
     await Course.findByIdAndDelete(course._id);
-    return respond({ message: "deleted", event });
+    return respond({ message: "deleted" });
 }
 
 module.exports.create = async function (event, context) {
