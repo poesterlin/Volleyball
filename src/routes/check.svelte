@@ -97,7 +97,7 @@
 	{:then value}
 		{#if value}
 			<h3>{value.name}</h3>
-			<Course course={value._course} selected={false} />
+			<Course course={value._course} selected={false} fullDate />
 			{#if value.waitlist}
 				<div id="waitlist" class="dark">
 					<b>You are on the waitlist. Register for E-Mail Updates:</b>
