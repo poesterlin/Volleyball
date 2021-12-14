@@ -5,17 +5,36 @@
 	import Loading from '../components/loading.svelte';
 	import { server } from '../helpers/env';
 	import { goto, prefetch } from '$app/navigation';
+	import { humanReadableDate } from '../helpers/date';
+	import { differenceInCalendarDays } from 'date-fns';
 
 	let key;
+	let keys = [];
 	let promise;
 	let loading = false;
 	let email;
+	let dropdown = false;
 
 	onMount(() => {
-		key = $page.query.get('key') ?? localStorage.getItem('lastKey');
+		key = $page.query.get('key') || localStorage.getItem('lastKey');
+		const storedKeys = JSON.parse(localStorage.getItem('keys'));
+
 		if (key) {
 			send();
 		}
+
+		if (!storedKeys) {
+			return;
+		}
+
+		const today = new Date();
+		keys = storedKeys.filter(k => differenceInCalendarDays(new Date(k.date), today) >= -1);
+		if (keys.length === 1) {
+			key = keys[0].key;
+			send();
+		}
+
+		localStorage.setItem('keys', JSON.stringify(keys));
 	});
 
 	function send() {
@@ -37,6 +56,7 @@
 				return resp.registration;
 			}
 
+			// localStorage.setItem('lastKey', undefined); // TODO: enable
 			throw new Error();
 		};
 
@@ -58,7 +78,7 @@
 				Accept: 'application/json',
 				'Content-Type': 'application/json'
 			}
-		}).then((j) => j.json());
+		}).then(j => j.json());
 		loading = false;
 		await goto('/');
 	}
@@ -72,59 +92,17 @@
 				Accept: 'application/json',
 				'Content-Type': 'application/json'
 			}
-		}).then((j) => j.json());
+		}).then(j => j.json());
 		email = 'registered';
 		loading = false;
 	}
+
+	async function select(val) {
+		key = val.key;
+		dropdown = false;
+		await send();
+	}
 </script>
-
-<Loading {loading} />
-<div id="header">
-	<div id="search">
-		<input
-			placeholder="Registration Code"
-			type="text"
-			on:keyup={isEnter}
-			name="name"
-			bind:value={key}
-		/>
-		<button id="check" on:click={send}>Check</button>
-	</div>
-</div>
-<div id="results">
-	{#await promise}
-		<h2>loading...</h2>
-	{:then value}
-		{#if value}
-			<h3>{value.name}</h3>
-			<Course course={value._course} selected={false} fullDate />
-			{#if value.waitlist}
-				<div id="waitlist" class="dark">
-					<b>You are on the waitlist. Register for E-Mail Updates:</b>
-					<div id="emailContainer">
-						<input
-							placeholder="E-Mail"
-							type="email"
-							name="email"
-							id="email"
-							on:keyup={(e) => isEnter(e, notify)}
-							bind:value={email}
-						/>
-
-						<button on:click={notify}>Submit</button>
-					</div>
-
-					<label for="email"
-						>Information is only stored until E-Mail is send or the course is done.</label
-					>
-				</div>
-			{/if}
-			<button id="cancel" on:click={() => cancel(value.key)}>Cancel Registration</button>
-		{/if}
-	{:catch _error}
-		<h2>No registration found.</h2>
-	{/await}
-</div>
 
 <style lang="scss">
 	@use '../helpers/theme' as *;
@@ -142,6 +120,7 @@
 		background: $c20;
 		#search {
 			display: flex;
+			position: relative;
 			background: white;
 			padding: 5px;
 			border-radius: 80px;
@@ -165,6 +144,53 @@
 				background: $cAccent;
 				border: 0;
 				border-radius: 80px;
+			}
+
+			.small {
+				padding: 0 1em;
+				background: $c100;
+				color: $c0;
+				font-weight: bold;
+				margin-right: 3px;
+
+				&:hover,
+				&.active {
+					background: $c80;
+				}
+			}
+
+			div {
+				position: absolute;
+				display: flex;
+				flex-wrap: wrap;
+				flex-direction: column;
+				top: calc(100% + 7px);
+				right: 0;
+				gap: 7px;
+				background: $c0;
+				border-radius: 20px;
+				padding: 5px;
+				box-sizing: border-box;
+				width: 80%;
+				box-shadow: 2px 3px 10px #00000059;
+				min-width: max-content;
+
+				button {
+					display: flex;
+					justify-content: space-between;
+					background: white;
+
+					&:hover {
+						box-shadow: 0px 0px 0px 2px $cAccent;
+					}
+				}
+				span:first-child {
+					color: $c40;
+					font-weight: normal;
+				}
+				span:nth-child(2) {
+					font-weight: bold;
+				}
 			}
 		}
 	}
@@ -254,3 +280,65 @@
 		}
 	}
 </style>
+
+<Loading {loading} />
+<div id="header">
+	<div id="search">
+		<input
+			placeholder="Registration Code"
+			type="text"
+			on:keyup={isEnter}
+			name="name"
+			bind:value={key} />
+		{#if keys.length > 1}
+			<button class="small" on:click={() => (dropdown = !dropdown)} class:active={dropdown}>
+				&or;
+			</button>
+		{/if}
+		{#if dropdown}
+			<div>
+				{#each keys as k}
+					<button on:click={() => select(k)}>
+						<span>{k.key}</span>
+						<span>{humanReadableDate(k.date)}</span>
+					</button>
+				{/each}
+			</div>
+		{/if}
+
+		<button id="check" on:click={send}>Check</button>
+	</div>
+</div>
+<div id="results">
+	{#await promise}
+		<h2>loading...</h2>
+	{:then value}
+		{#if value}
+			<h3>{value.name}</h3>
+			<Course course={value._course} selected={false} fullDate />
+			{#if value.waitlist}
+				<div id="waitlist" class="dark">
+					<b>You are on the waitlist. Register for E-Mail Updates:</b>
+					<div id="emailContainer">
+						<input
+							placeholder="E-Mail"
+							type="email"
+							name="email"
+							id="email"
+							on:keyup={e => isEnter(e, notify)}
+							bind:value={email} />
+
+						<button on:click={notify}>Submit</button>
+					</div>
+
+					<label for="email">
+						Information is only stored until E-Mail is send or the course is done.
+					</label>
+				</div>
+			{/if}
+			<button id="cancel" on:click={() => cancel(value.key)}>Cancel Registration</button>
+		{/if}
+	{:catch _error}
+		<h2>No registration found.</h2>
+	{/await}
+</div>

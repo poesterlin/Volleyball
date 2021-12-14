@@ -21,22 +21,22 @@
 
 	async function update() {
 		loading = true;
-		let { courses: res } = await fetch(server + '/courses').then((r) => r.json());
+		let { courses: res } = await fetch(server + '/courses').then(r => r.json());
 
-		res.forEach((course) => {
+		res.forEach(course => {
 			course.date = new Date(course.date);
 		});
 
 		const dates = (res as any[]).reduce((map, c) => map.set(c.date.toDateString()), new Map());
 
-		blocks = Array.from(dates.keys()).map((date) => ({
+		blocks = Array.from(dates.keys()).map(date => ({
 			date,
-			courses: res.filter((c) => c.date.toDateString() === date)
+			courses: res.filter(c => c.date.toDateString() === date)
 		}));
 
 		loading = false;
-		if (blocks.flatMap((b) => b.courses).length === 1) {
-			courseID = blocks.flatMap((b) => b.courses)[0]._id;
+		if (blocks.flatMap(b => b.courses).length === 1) {
+			courseID = blocks.flatMap(b => b.courses)[0]._id;
 		}
 	}
 
@@ -58,9 +58,17 @@
 				Accept: 'application/json',
 				'Content-Type': 'application/json'
 			}
-		}).then((j) => j.json());
+		}).then(j => j.json());
 
 		localStorage.setItem('lastKey', res.registration.key);
+
+		const storedKeys = JSON.parse(localStorage.getItem('keys')) || [];
+		storedKeys.push({
+			key: res.registration.key,
+			date: blocks.flatMap(b => b.courses).find(c => c._id === courseID).date
+		});
+		localStorage.setItem('keys', JSON.stringify(storedKeys));
+
 		registration = res.registration;
 
 		loading = false;
@@ -159,14 +167,6 @@
 		font-weight: bold;
 		cursor: pointer;
 		box-shadow: 1px 1px 8px #0000002e;
-	}
-
-	#links {
-		display: flex;
-		justify-content: center;
-		gap: 20px;
-		color: cadetblue;
-		font-weight: bold;
 	}
 
 	button.disabled {
