@@ -263,6 +263,10 @@
 		label {
 			color: $c80;
 		}
+
+		big{
+			text-decoration: underline;
+		}
 	}
 
 	#cancel {
@@ -318,7 +322,7 @@
 			<Course course={value._course} selected={false} fullDate />
 			{#if value.waitlist}
 				<div id="waitlist" class="dark">
-					<b>You are on the waitlist. Register for E-Mail Updates:</b>
+					<b>You have spot <big>#{value.waitlistSpot}</big> on the waitlist. Register for E-Mail Updates:</b>
 					<div id="emailContainer">
 						<input
 							placeholder="E-Mail"

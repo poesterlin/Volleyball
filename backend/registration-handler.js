@@ -36,8 +36,18 @@ module.exports.get = async function (event, context) {
         return respond({ message: "no registration found" }, 404);
     }
 
+
     const sanitized = registration.toObject();
     sanitized.email = undefined;
+    if (registration.waitlist) {
+        sanitized.waitlistSpot = await Registration.countDocuments({
+            _course: registration._course._id,
+            waitlist: true,
+            date: {
+                $lte: registration.registered
+            }
+        });
+    }
 
     return respond({ registration: sanitized });
 }
