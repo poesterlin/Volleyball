@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
 	import Course from '../components/course.svelte';
+	import MadeIt from '../components/madeit.svelte';
 	import Loading from '../components/loading.svelte';
 	import { server } from '../helpers/env';
 	import { goto, prefetch } from '$app/navigation';
@@ -209,7 +210,7 @@
 		margin-top: 1em;
 	}
 	h3 {
-		margin-top: 2em;
+        font-weight: bold;
 	}
 
 	#waitlist {
@@ -264,7 +265,7 @@
 			color: $c80;
 		}
 
-		big{
+		big {
 			text-decoration: underline;
 		}
 	}
@@ -318,11 +319,18 @@
 		<h2>loading...</h2>
 	{:then value}
 		{#if value}
+			{#if !value.waitlist}
+				<MadeIt />
+			{/if}
 			<h3>{value.name}</h3>
 			<Course course={value._course} selected={false} fullDate />
 			{#if value.waitlist}
 				<div id="waitlist" class="dark">
-					<b>You have spot <big>#{value.waitlistSpot}</big> on the waitlist. Register for E-Mail Updates:</b>
+					<b>
+						You have spot
+						<big>#{value.waitlistSpot}</big>
+						on the waitlist. Register for E-Mail Updates:
+					</b>
 					<div id="emailContainer">
 						<input
 							placeholder="E-Mail"
