@@ -8,10 +8,15 @@
 	export let selected;
 	export let deletable = false;
 	export let fullDate = false;
+	export let showPublishDate = false;
 
 	$: registered = Array.isArray(course?.registered)
 		? course?.registered?.length
 		: course?.registered;
+	
+	function formatPublishDate(){
+		return new Intl.DateTimeFormat('en-GB', { weekday: "short", month: "2-digit", day:"2-digit", hour: "2-digit", minute:"2-digit" }).format(new Date(course.publishOn))
+	}
 </script>
 
 <div
@@ -31,6 +36,10 @@
 	</div>
 	<Scale avaliable={course.spots} booked={registered} dark={selected} />
 	<span>{course.location}</span>
+	{#if showPublishDate}
+	<br>
+		<span>Publish On: {formatPublishDate()} </span>
+	{/if}
 	{#if deletable}
 		<button on:click={() => dispatch('delete')}>Delete</button>
 	{/if}

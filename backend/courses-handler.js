@@ -4,15 +4,14 @@ const mongoose = require('mongoose');
 const { connectDB, respond, inNDays, endOfDay } = require('./helpers');
 const Schema = mongoose.Schema;
 const Registration = mongoose.model('Registration', new Schema({ registered: Date, name: String, waitlist: Boolean, key: String, email: String, _course: { type: Schema.Types.ObjectId, ref: 'Course' } }));
-const Course = mongoose.model('Course', new Schema({ name: String, location: String, spots: Number, time: String, duration: Number, date: Date, registered: [{ type: Schema.Types.ObjectId, ref: 'Registration' }] }));
+const Course = mongoose.model('Course', new Schema({ name: String, location: String, publishOn: Date, spots: Number, time: String, duration: Number, date: Date, registered: [{ type: Schema.Types.ObjectId, ref: 'Registration' }] }));
 
 module.exports.get = async function (event, context) {
     await connectDB();
 
     const courses = await Course.find({
-        date: {
-            $gte: inNDays(-1),
-            $lte: endOfDay(inNDays(7))
+        publishOn: {
+            $lt: endOfDay(new Date())
         }
     }).sort({ date: 1 });
 
@@ -60,20 +59,20 @@ module.exports.delete = async function (event, context) {
 
 module.exports.create = async function (event, context) {
     await connectDB();
-    const { name, location, spots, time, duration, date } = JSON.parse(event.body);
-    if (![name, location, spots, time, duration, date].every(Boolean)) {
+    const { name, location, spots, time, duration, date, publishOn } = JSON.parse(event.body);
+    if (![name, location, spots, time, duration, date, publishOn].every(Boolean)) {
         return respond({ message: "error" }, 400);
     }
 
-    await new Course({ name, location, spots, time, duration, date, registered: [] }).save();
+    await new Course({ name, location, spots, time, duration, date, publishOn, registered: [] }).save();
 
     // auto delete courses older than yesterday
     const yesterday = new Date(new Date().setDate(new Date().getDate() - 1));
     const courses = await Course.find({ date: { $lte: yesterday } }).sort({ date: 1 }).populate('registered');
 
     if (courses.length > 0) {
-        await Registration.deleteMany({ _id: courses.flatMap((c) => c.registered).map(r => r._id) });
-        await Course.deleteMany({ _id: courses.map(r => r._id) });
+        await Registration.deleteMany({ _id: { $in: courses.flatMap((c) => c.registered.map(r => r._id)) } });
+        await Course.deleteMany({ _id: { $in: courses.map(r => r._id) } });
     }
 
     return respond({ message: "created" });

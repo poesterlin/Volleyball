@@ -1,5 +1,5 @@
 <script>
-	import { daysOfWeek, humanReadableDate, monthsOfYear } from '../helpers/date';
+	import { daysOfWeek, humanReadableDate, monthsOfYear, addDays } from '../helpers/date';
 	import Datepicker from 'svelte-calendar';
 	import { createEventDispatcher } from 'svelte';
 	const dispatch = createEventDispatcher();
@@ -12,7 +12,8 @@
 		spots: 18,
 		time: '20:30',
 		duration: 1.5,
-		date: new Date()
+		date: addDays(new Date(), 7),
+		publishOn: new Date(), 
 	};
 </script>
 
@@ -53,15 +54,28 @@
 			<label for="time">Time</label>
 			<input type="text" bind:value={course.time} placeholder="Time" id="time" />
 		</p>
-		<Datepicker
+		<p>
+			<label for="">Date:</label>
+			<Datepicker
 			{daysOfWeek}
 			{monthsOfYear}
 			start={new Date()}
 			startOfWeekIndex={1}
 			bind:selected={course.date}
 			format={humanReadableDate}
-		/>
-
+			/>
+		</p>
+		<p>
+			<label for="">Publish on:</label>
+			<Datepicker
+			{daysOfWeek}
+			{monthsOfYear}
+			start={addDays(new Date(), -7)}
+			startOfWeekIndex={1}
+			bind:selected={course.publishOn}
+			format={humanReadableDate}
+			/>
+		</p>
 		<button on:click={() => dispatch('submit', course)}>Create</button>
 	</div>
 </div>

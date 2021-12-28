@@ -113,6 +113,7 @@
 
 	function copy() {
 		const course = courses.find((c) => c._id === courseID);
+		console.log(course)
 		const regs = course.registered
 			.filter((r) => !r.waitlist)
 			.map((r) => r.name)
@@ -120,6 +121,7 @@
 			.join(',\n');
 		navigator.clipboard.writeText(regs);
 	}
+
 
 	function logout() {
 		authHelper.logout(localStorage);
@@ -153,6 +155,7 @@
 				on:delete={() => deleteCourse(course._id)}
 				deletable
 				fullDate
+				showPublishDate
 			/>
 		{/each}
 	</div>
