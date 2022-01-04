@@ -100,8 +100,26 @@ const endOfDay = (date) => {
     return date;
 }
 
+const middleOfDay = (date) => {
+    date.setHours(11, 0, 0, 0);
+    return date;
+}
+
+/**
+ * 
+ * @param {Date} date 
+ * @param {number} days 
+ * @returns 
+ */
+const addDays = (date, days) => {
+    date.setDate(date.getDate() + days);
+    return date;
+}
+
 module.exports.sendEmail = sendEmail;
 module.exports.inNDays = inNDays;
 module.exports.endOfDay = endOfDay;
+module.exports.middleOfDay = middleOfDay;
+module.exports.addDays = addDays;
 module.exports.respond = respond;
 module.exports.connectDB = connectDB;

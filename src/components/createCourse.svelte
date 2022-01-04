@@ -15,10 +15,6 @@
 		date: addDays(new Date(), 7),
 		publishOn: new Date(),
 	};
-
-	$: {
-		console.log(course, course.publishOn, new Intl.DateTimeFormat('en-GB', { weekday: "short", month: "2-digit", day:"2-digit", hour: "2-digit", minute:"2-digit" }).format(new Date(course.publishOn)))
-	}
 </script>
 
 <div id="overlay" on:click|self={() => dispatch('close')}>

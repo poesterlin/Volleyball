@@ -58,7 +58,7 @@
 	function showRegistrations({ detail }) {
 		courseID = detail.course;
 		const course = courses.find((c) => c._id === courseID);
-		registrations = course.registered;
+		registrations = course?.registered ?? [];
 		fetchCourses(false);
 	}
 	async function deleteCourse(id) {

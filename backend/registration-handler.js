@@ -43,7 +43,7 @@ module.exports.get = async function (event, context) {
         sanitized.waitlistSpot = await Registration.countDocuments({
             _course: registration._course._id,
             waitlist: true,
-            date: {
+            registered: {
                 $lte: registration.registered
             }
         });

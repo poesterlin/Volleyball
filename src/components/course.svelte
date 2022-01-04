@@ -14,9 +14,7 @@
 		? course?.registered?.length
 		: course?.registered;
 	
-	function formatPublishDate(){
-		return new Intl.DateTimeFormat('en-GB', { weekday: "short", month: "2-digit", day:"2-digit", hour: "2-digit", minute:"2-digit" }).format(new Date(course.publishOn));
-	}
+	$: formated = new Intl.DateTimeFormat('en-GB', { weekday: "short", month: "2-digit", day:"2-digit", hour: "2-digit", minute:"2-digit" }).format(new Date(course.publishOn));
 </script>
 
 <div
@@ -38,7 +36,7 @@
 	<span>{course.location}</span>
 	{#if showPublishDate}
 	<br>
-		<span>Publish On: {formatPublishDate()} </span>
+		<span>Publish On: {formated} </span>
 	{/if}
 	{#if deletable}
 		<button on:click={() => dispatch('delete')}>Delete</button>
