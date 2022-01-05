@@ -199,7 +199,7 @@ module.exports.create = async function (event, context) {
     await connectDB();
     // Check if name and key was submitted before
     if (lastKey) {
-        const lastReg = await Registration.findOne({ key: lastKey, name });
+        const lastReg = await Registration.findOne({ key: lastKey, name, course });
         if (lastReg) {
             return respond({ registration: { ...lastReg.toObject(), registeredTwice: true } });
         }
@@ -213,7 +213,7 @@ module.exports.create = async function (event, context) {
     // generate registration key
     // TODO: change encoding to base64url
     const key = Buffer.from(randomUUID(), "hex").toString("base64").replace(/=/gm, "").replace(/\+/gm, "-");
-
+    
     const waitlist = registeredCourse.spots <= registeredCourse.registered.length;
     const registration = await new Registration({ registered: new Date(), name, waitlist, key, _course: registeredCourse._id }).save();
     registeredCourse.registered.push(registration._id);
