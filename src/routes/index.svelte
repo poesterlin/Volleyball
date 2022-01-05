@@ -95,7 +95,7 @@
 	{/if}
 	<input type="text" placeholder="Name" on:keyup={isEnter} name="name" bind:value={name} />
 	<div id="list">
-		{#each blocks as block}
+		{#each blocks as block,i}
 			<span>{humanReadableDate(block.date)}</span>
 			{#each block.courses as course}
 				<Course
@@ -104,6 +104,9 @@
 					selected={course._id === courseID}
 				/>
 			{/each}
+			{#if i < blocks.length - 1}
+				<div class="line"></div>
+			{/if}
 		{/each}
 		{#if blocks.length === 0}There are currently no courses. ☹{/if}
 	</div>
@@ -116,15 +119,25 @@
 
 <style lang="scss">
 	@use '../helpers/theme' as *;
+	@use 'sass:color';
 
 	$padding: 5px;
 
 	span {
-		font-size: 12px;
+		font-size: 14px;
+		font-weight: bold;
 		text-transform: capitalize;
 		margin-top: 20px;
 		display: block;
-		margin-bottom: -10px;
+		margin-left: 20px;
+	}
+
+	.line{
+		width: 60%;
+		margin: 60px 20% 50px;
+		height: 2px;
+		opacity: 0.4;
+		background: linear-gradient(90deg, $c80 0%, $c40 50%, $c80 100%);
 	}
 
 	main {
