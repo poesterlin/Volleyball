@@ -162,6 +162,7 @@
 
 			div {
 				position: absolute;
+				z-index: 100;
 				display: flex;
 				flex-wrap: wrap;
 				flex-direction: column;
