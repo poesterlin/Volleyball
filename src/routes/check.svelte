@@ -29,7 +29,11 @@
 		}
 
 		const today = new Date();
-		keys = storedKeys.filter(k => differenceInCalendarDays(new Date(k.date), today) >= -1);
+		const seen = {};
+		keys = storedKeys
+				.filter(k => differenceInCalendarDays(new Date(k.date), today) >= -1)
+				.filter((item)=> seen.hasOwnProperty(item.key) ? false : (seen[item.key] = true));
+
 		if (keys.length === 1) {
 			key = keys[0].key;
 			send();
@@ -44,20 +48,24 @@
 		}
 		loading = true;
 		const fn = async () => {
-			const res = await fetch(server + '/registration?regKey=' + encodeURIComponent(key), {
-				headers: {
-					Accept: 'application/json',
-					'Content-Type': 'application/json'
+			try {
+				const res = await fetch(server + '/registration?regKey=' + encodeURIComponent(key), {
+					headers: {
+						Accept: 'application/json',
+						'Content-Type': 'application/json'
+					}
+				});
+				
+				loading = false;
+				if (res.ok) {
+					const resp = await res.json();
+					return resp.registration;
 				}
-			});
+			} catch (error) {}
 
-			loading = false;
-			if (res.ok) {
-				const resp = await res.json();
-				return resp.registration;
-			}
-
-			// localStorage.setItem('lastKey', undefined); // TODO: enable
+			const storedKeys = JSON.parse(localStorage.getItem('keys'));
+			keys = storedKeys.filter(f=>f.key !== key);
+			localStorage.setItem('keys', JSON.stringify(keys));
 			throw new Error();
 		};
 
