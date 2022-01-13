@@ -10,7 +10,8 @@
 		"cors": "^2.8.5",
 		"jsonwebtoken": "^8.5.1",
 		"jwk-to-pem": "^2.0.5",
-		"mongoose": "^6.0.13"
+		"mongoose": "^6.0.13",
+		"web-push": "^3.4.5"
 	},
 	"license": "ISC"
 }

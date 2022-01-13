@@ -23,6 +23,9 @@ provider:
     db_user: ${param:db_user}
     auth_client: ${param:auth_client}
     email_key: ${param:email_key}
+    VAPID_PUBLIC: ${param:VAPID_PUBLIC}
+    VAPID_PRIVATE: ${param:VAPID_PRIVATE}
+
 
 package:
   include:
@@ -113,6 +116,14 @@ functions:
       - http:
           method: POST
           path: registration
+          cors: true
+
+  register_push_notification:
+    handler: registration-handler.registerPushNotification
+    events:
+      - http:
+          method: POST
+          path: notify
           cors: true
 
   register_trainer:

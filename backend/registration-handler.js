@@ -10,6 +10,11 @@ const Schema = mongoose.Schema;
 const { randomUUID } = require('crypto');
 const { respond, connectDB, inNDays, endOfDay, sendEmail } = require('./helpers');
 
+const webpush = require('web-push');
+const publicVapidKey = process.env.VAPID_PUBLIC;
+const privateVapidKey = process.env.VAPID_PRIVATE;
+webpush.setVapidDetails('https://volleyballhtwg.netlify.app', publicVapidKey, privateVapidKey);
+
 const regSchema = new Schema({ registered: Date, name: String, waitlist: Boolean, key: String, email: String, _course: { type: Schema.Types.ObjectId, ref: 'Course' } });
 
 regSchema.pre('remove', { document: true, query: false }, async function () {
@@ -21,6 +26,8 @@ regSchema.pre('remove', { document: true, query: false }, async function () {
 const Registration = mongoose.model('Registration', regSchema);
 // @ts-ignore
 const Course = mongoose.model('Course', new Schema({ name: String, location: String, spots: Number, time: String, duration: Number, date: Date, registered: [{ type: Schema.Types.ObjectId, ref: 'Registration' }] }));
+// @ts-ignore
+const Notification = mongoose.model('Notification', new Schema({ subscription: Object }));
 
 module.exports.get = async function (event, context) {
     const regKey = decodeURIComponent(event.queryStringParameters.regKey);
@@ -187,6 +194,26 @@ module.exports.notify = async function (event, context) {
     await reg.save();
 
     return respond({ message: "saved" });
+}
+
+
+module.exports.registerPushNotification = async function (event, context) {
+    const { subscription } = JSON.parse(event.body);
+
+    if (!subscription) {
+        return respond({ message: "error" }, 400);
+    }
+
+    await connectDB();
+    await new Notification({ subscription }).save();
+
+    const payload = JSON.stringify({ title: 'test' });
+
+    webpush.sendNotification(subscription, payload).catch(error => {
+        console.error(error.stack);
+    });
+
+    return respond({ message: "notification registered" });
 }
 
 module.exports.create = async function (event, context) {
