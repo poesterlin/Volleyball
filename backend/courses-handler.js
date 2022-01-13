@@ -13,7 +13,7 @@ module.exports.get = async function (event, context) {
         publishOn: {
             $lt: new Date()
         }
-    }).sort({ date: 1 });
+    }).sort({ date: 1, time: 1 });
 
     return respond({
         courses: courses.map((c) => {
@@ -28,7 +28,7 @@ module.exports.details = async function (event, context) {
     try {
 
         await connectDB();
-        const courses = await Course.find().sort({ date: 1 }).populate('registered');
+        const courses = await Course.find().sort({ date: 1, time: 1 }).populate('registered');
 
         return respond({
             courses: courses.map((c) => {
