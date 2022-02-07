@@ -201,6 +201,7 @@
 	}
 	#header > button {
 		border: 0;
+		padding: 0.2em 1.5em;
 	}
 
 	#columns {

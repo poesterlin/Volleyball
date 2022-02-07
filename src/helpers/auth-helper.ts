@@ -1,3 +1,5 @@
+import jwt_decode, { JwtPayload } from "jwt-decode";
+
 let loggedIn = false;
 let token = undefined;
 let profile = undefined;
@@ -5,7 +7,7 @@ let profile = undefined;
 function readStorage(store) {
     token = store.getItem("id_token");
     profile = JSON.parse(store.getItem("profile"));
-    loggedIn = !!token;
+    loggedIn = !!token && jwt_decode<JwtPayload>(token).exp * 1000 > Date.now();
 }
 
 export default {
