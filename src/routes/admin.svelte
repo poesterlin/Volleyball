@@ -13,6 +13,7 @@
 	let registrations = [];
 	let showOverlay = false;
 	let loading = false;
+	let preRegisterName = "";
 
 	$: isLoggedIn = store && authHelper.authenticated(store);
 	$: token = store && store.getItem('id_token');
@@ -122,6 +123,20 @@
 		navigator.clipboard.writeText(regs);
 	}
 
+	async function preregister(){
+		if(!preRegisterName || !courseID){
+			return;
+		}
+		await fetch(server + '/registration', {
+			method: 'POST',
+			body: JSON.stringify({ name:preRegisterName, course: courseID }),
+			headers: {
+				Accept: 'application/json',
+				'Content-Type': 'application/json'
+			}
+		}).then(j => j.json());
+		await update();
+	}
 
 	function logout() {
 		authHelper.logout(localStorage);
@@ -162,6 +177,14 @@
 	<div id="right">
 		{#if registrations}
 			<h2>Registrations <button id="copy" on:click={copy}>Copy</button></h2>
+			{#if courseID}
+				<div id="preregister">
+					<label>Add Registration: 
+						<input type="text" bind:value={preRegisterName}>
+					</label> 
+					<button on:click={preregister}>></button> 
+				</div>
+			{/if}
 			<table>
 				{#each registrations as reg, idx}
 					<div class="registration" class:waitlist={reg.waitlist}>
@@ -326,5 +349,24 @@
 		100% {
 			transform: rotate(360deg);
 		}
+	}
+
+	#preregister{
+		display: flex;
+		justify-content: space-around;
+		margin-bottom: 1em;
+	}
+	#preregister label input{
+		flex: 1 1 40%;
+    	max-width: 40%;
+	}
+	#preregister button{
+		border: 0;
+    	padding: 0.2em 1.5em;
+	}
+	#preregister label{
+		display: flex;
+		justify-content: space-between;
+		width: 90%;
 	}
 </style>
