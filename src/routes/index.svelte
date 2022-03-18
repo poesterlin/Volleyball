@@ -6,7 +6,6 @@
 	import Course from '../components/course.svelte';
 	import Loading from '../components/loading.svelte';
 	import { server } from '../helpers/env';
-	import ShamelessPlug from '../components/shamelessPlug.svelte';
 
 	let blocks = [];
 	let name;
@@ -88,7 +87,6 @@
 	}
 </script>
 
-<ShamelessPlug></ShamelessPlug>
 <Loading {loading} />
 
 <main>
