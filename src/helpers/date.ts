@@ -40,7 +40,7 @@ export function humanReadableDate(date: Date | string) {
 		} else {
 			modifier = 'in';
 		}
-		return `${weekday}, ${modifier} ${days} days`;
+		return `${weekday}, ${modifier} ${Math.abs(days)} days`;
 	}
 
 	const weeks = differenceInCalendarISOWeeks(comp, today);
