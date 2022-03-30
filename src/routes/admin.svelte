@@ -117,7 +117,7 @@
 		console.log(course)
 		const regs = course.registered
 			.filter((r) => !r.waitlist)
-			.map((r) => r.name)
+			.map((r) => r.name.trim())
 			.sort((a, b) => a.localeCompare(b))
 			.join(',\n');
 		navigator.clipboard.writeText(regs);
