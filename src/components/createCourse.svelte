@@ -4,7 +4,7 @@
 	import { createEventDispatcher } from 'svelte';
 	const dispatch = createEventDispatcher();
 
-	const difficulties = ['Beginner', 'Advanced', 'Actives', 'Beach Course'];
+	const difficulties = ['Beginner', 'Advanced', 'Actives', 'Beach Course', 'Actives - 5:1 System'];
 
 	let course = {
 		name: 'Volleyball - ',
