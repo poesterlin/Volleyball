@@ -114,12 +114,22 @@
 
 	function copy() {
 		const course = courses.find((c) => c._id === courseID);
-		console.log(course)
-		const regs = course.registered
+
+		const waitlist = course.registered
+			.filter((r) => r.waitlist)
+			.map((r, i) => `#${i + 1}: ${r.name.trim()}`)
+
+		const regs = 
+			`*${course.name}:*
+${course.registered
 			.filter((r) => !r.waitlist)
 			.map((r) => r.name.trim())
 			.sort((a, b) => a.localeCompare(b))
-			.join(',\n');
+			.join(',\n')}
+
+_Warteliste:_
+${waitlist.join(",\n")}`;
+
 		navigator.clipboard.writeText(regs);
 	}
 
