@@ -262,6 +262,7 @@
 				margin-left: 1em;
 				outline: 0;
 				min-width: 0;
+				color: black;
 			}
 		}
 
