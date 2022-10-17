@@ -8,7 +8,7 @@
 	import { server } from '../helpers/env';
 
 	let blocks = [];
-	let name;
+	let name: string;
 	let triedToSend = false;
 	let registration;
 	let courseID;
@@ -41,7 +41,8 @@
 	}
 
 	const minTextLength = 4;
-	$: tooShortText = !name || name.length < minTextLength;
+	$: tooShortText =
+		!name || name.length < minTextLength || !new RegExp(/[a-zA-Z]{2,}\s[a-zA-Z]{1,}/).test(name);
 	$: canSend = !tooShortText && courseID;
 
 	async function send() {
@@ -91,7 +92,7 @@
 
 <main>
 	{#if !canSend && triedToSend}
-		<label class="red" for="name">Name too short!</label>
+		<label class="red" for="name">Make sure to include your last name.</label>
 	{/if}
 	<input type="text" placeholder="Name" on:keyup={isEnter} name="name" bind:value={name} />
 	<div id="list">
