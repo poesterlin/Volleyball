@@ -94,7 +94,7 @@
 	{#if !canSend && triedToSend}
 		<label class="red" for="name">Make sure to include your last name.</label>
 	{/if}
-	<input type="text" placeholder="Name" on:keyup={isEnter} name="name" bind:value={name} />
+	<input type="text" autocomplete="name" placeholder="Name" on:keyup={isEnter} name="name" bind:value={name} />
 	<div id="list">
 		{#each blocks as block,i}
 			<span>{humanReadableDate(block.date)}</span>
