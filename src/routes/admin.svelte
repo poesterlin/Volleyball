@@ -63,6 +63,9 @@
 		fetchCourses(false);
 	}
 	async function deleteCourse(id) {
+		if (!confirm('Are you sure you want to delete the course?')) {
+			return;
+		}
 		loading = true;
 		await fetch(server + '/courses?id=' + id, { method: 'DELETE', headers }).then((r) => r.json());
 		await update();
@@ -70,6 +73,10 @@
 	}
 
 	async function deleteRegistaration(key) {
+		if (!confirm('Are you sure you want to cancel the registration?')) {
+			return;
+		}
+
 		loading = true;
 		await fetch(server + '/registration?regKey=' + encodeURIComponent(key), {
 			method: 'DELETE'
