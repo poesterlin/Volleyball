@@ -13,7 +13,7 @@
 	let registrations = [];
 	let showOverlay = false;
 	let loading = false;
-	let preRegisterName = "";
+	let preRegisterName = '';
 
 	$: isLoggedIn = store && authHelper.authenticated(store);
 	$: token = store && store.getItem('id_token');
@@ -124,34 +124,33 @@
 
 		const waitlist = course.registered
 			.filter((r) => r.waitlist)
-			.map((r, i) => `#${i + 1}: ${r.name.trim()}`)
+			.map((r, i) => `#${i + 1}: ${r.name.trim()}`);
 
-		const regs = 
-			`*${course.name}:*
-${course.registered
+		let regs = `*${course.name}:*\n${course.registered
 			.filter((r) => !r.waitlist)
 			.map((r) => r.name.trim())
 			.sort((a, b) => a.localeCompare(b))
-			.join(',\n')}
+			.join(',\n')}`;
 
-_Warteliste:_
-${waitlist.join(",\n")}`;
+		if (waitlist.length > 0) {
+			regs += `\n_Warteliste:_\n${waitlist.join(',\n')}`;
+		}
 
 		navigator.clipboard.writeText(regs);
 	}
 
-	async function preregister(){
-		if(!preRegisterName || !courseID){
+	async function preregister() {
+		if (!preRegisterName || !courseID) {
 			return;
 		}
 		await fetch(server + '/registration', {
 			method: 'POST',
-			body: JSON.stringify({ name:preRegisterName, course: courseID }),
+			body: JSON.stringify({ name: preRegisterName, course: courseID }),
 			headers: {
 				Accept: 'application/json',
 				'Content-Type': 'application/json'
 			}
-		}).then(j => j.json());
+		}).then((j) => j.json());
 		await update();
 	}
 
@@ -196,10 +195,11 @@ ${waitlist.join(",\n")}`;
 			<h2>Registrations <button id="copy" on:click={copy}>Copy</button></h2>
 			{#if courseID}
 				<div id="preregister">
-					<label>Add Registration: 
-						<input type="text" bind:value={preRegisterName}>
-					</label> 
-					<button on:click={preregister}>></button> 
+					<label
+						>Add Registration:
+						<input type="text" bind:value={preRegisterName} />
+					</label>
+					<button on:click={preregister}>></button>
 				</div>
 			{/if}
 			<table>
@@ -368,20 +368,20 @@ ${waitlist.join(",\n")}`;
 		}
 	}
 
-	#preregister{
+	#preregister {
 		display: flex;
 		justify-content: space-around;
 		margin-bottom: 1em;
 	}
-	#preregister label input{
+	#preregister label input {
 		flex: 1 1 40%;
-    	max-width: 40%;
+		max-width: 40%;
 	}
-	#preregister button{
+	#preregister button {
 		border: 0;
-    	padding: 0.2em 1.5em;
+		padding: 0.2em 1.5em;
 	}
-	#preregister label{
+	#preregister label {
 		display: flex;
 		justify-content: space-between;
 		width: 90%;

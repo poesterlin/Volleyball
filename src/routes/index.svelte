@@ -21,22 +21,22 @@
 
 	async function update() {
 		loading = true;
-		let { courses: res } = await fetch(server + '/courses').then(r => r.json());
+		let { courses: res } = await fetch(server + '/courses').then((r) => r.json());
 
-		res.forEach(course => {
+		res.forEach((course) => {
 			course.date = new Date(course.date);
 		});
 
 		const dates = (res as any[]).reduce((map, c) => map.set(c.date.toDateString()), new Map());
 
-		blocks = Array.from(dates.keys()).map(date => ({
+		blocks = Array.from(dates.keys()).map((date) => ({
 			date,
-			courses: res.filter(c => c.date.toDateString() === date)
+			courses: res.filter((c) => c.date.toDateString() === date)
 		}));
 
 		loading = false;
-		if (blocks.flatMap(b => b.courses).length === 1) {
-			courseID = blocks.flatMap(b => b.courses)[0]._id;
+		if (blocks.flatMap((b) => b.courses).length === 1) {
+			courseID = blocks.flatMap((b) => b.courses)[0]._id;
 		}
 	}
 
@@ -59,14 +59,14 @@
 				Accept: 'application/json',
 				'Content-Type': 'application/json'
 			}
-		}).then(j => j.json());
+		}).then((j) => j.json());
 
 		localStorage.setItem('lastKey', res.registration.key);
 
 		const storedKeys = JSON.parse(localStorage.getItem('keys')) || [];
 		storedKeys.push({
 			key: res.registration.key,
-			date: blocks.flatMap(b => b.courses).find(c => c._id === courseID).date
+			date: blocks.flatMap((b) => b.courses).find((c) => c._id === courseID).date
 		});
 		localStorage.setItem('keys', JSON.stringify(storedKeys));
 
@@ -96,7 +96,7 @@
 	{/if}
 	<input type="text" autocomplete="name" placeholder="Name" on:keyup={isEnter} name="name" bind:value={name} />
 	<div id="list">
-		{#each blocks as block,i}
+		{#each blocks as block, i}
 			<span>{humanReadableDate(block.date)}</span>
 			{#each block.courses as course}
 				<Course
@@ -106,7 +106,7 @@
 				/>
 			{/each}
 			{#if i < blocks.length - 1}
-				<div class="line"></div>
+				<div class="line" />
 			{/if}
 		{/each}
 		{#if blocks.length === 0}There are currently no courses. ☹{/if}
@@ -114,7 +114,7 @@
 
 	<button id="register" on:click={send} class:disabled={!canSend}>Register</button>
 	{#if registration && showOverlay}
-		<RegisteredOverlay on:close={()=>showOverlay = false} {registration} />
+		<RegisteredOverlay on:close={() => (showOverlay = false)} {registration} />
 	{/if}
 </main>
 
@@ -133,7 +133,7 @@
 		margin-left: 20px;
 	}
 
-	.line{
+	.line {
 		width: 60%;
 		margin: 60px 20% 50px;
 		height: 2px;

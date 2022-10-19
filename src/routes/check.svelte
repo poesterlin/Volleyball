@@ -79,6 +79,10 @@
 	}
 
 	async function cancel(key) {
+		if (!confirm('Are you sure you want to cancel your registration?')) {
+			return;
+		}
+
 		loading = true;
 		prefetch('/');
 		await fetch(server + '/registration?regKey=' + encodeURIComponent(key), {
