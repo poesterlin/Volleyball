@@ -143,6 +143,7 @@
 		if (!preRegisterName || !courseID) {
 			return;
 		}
+		loading = true;
 		await fetch(server + '/registration', {
 			method: 'POST',
 			body: JSON.stringify({ name: preRegisterName, course: courseID }),
@@ -151,6 +152,15 @@
 				'Content-Type': 'application/json'
 			}
 		}).then((j) => j.json());
+		await update();
+	}
+
+	async function toggleStrike(key) {
+		if (!confirm('Are you sure you want to add/remove a strike?')) {
+			return;
+		}
+		loading = true;
+		await fetch(server + '/registration/clear-strike?regKey=' + encodeURIComponent(key), {headers}).then((j) => j.json());
 		await update();
 	}
 
@@ -217,6 +227,13 @@
 							{/if}
 						</span>
 						<span>
+							<button class="strikeBtn" on:click={() => toggleStrike(reg.key)}>
+								{#if reg.suspectedStrike}
+									Strike User
+								{:else}
+									Remove Strike
+								{/if}
+							</button>
 							<button class="registrationButton" on:click={() => deleteRegistaration(reg.key)}>
 								Cancel
 							</button>
