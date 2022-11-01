@@ -248,14 +248,15 @@
 			</table>
 		{:else}Select a course.{/if}
 	</div>
-
-	{#each strikes as strike}
-		<div>
-			<span>{strike.name} </span>
-			<span>format({strike.date}) </span>
-		</div>
-	{/each}
 </div>
+
+<h2>Strikes</h2>
+{#each strikes as strike}
+	<div>
+		<span>{strike.name} </span>
+		<span>{format(strike.date)} </span>
+	</div>
+{/each}
 
 {#if showOverlay}
 	<CourseCreator on:submit={createCourse} on:close={toggleOverlay} />
