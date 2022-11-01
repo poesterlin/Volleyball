@@ -51,7 +51,7 @@
 
 	async function fetchCourses(load = true) {
 		loading = load;
-		
+
 		const res = await fetch(server + '/courses/details', { headers }).then((r) => r.json());
 		courses = res.courses || [];
 
@@ -234,9 +234,9 @@
 						<span>
 							<button class="strikeBtn" on:click={() => toggleStrike(reg.key)}>
 								{#if reg.suspectedStrike}
-									Strike User
-								{:else}
 									Remove Strike
+								{:else}
+									Strike User
 								{/if}
 							</button>
 							<button class="registrationButton" on:click={() => deleteRegistaration(reg.key)}>
