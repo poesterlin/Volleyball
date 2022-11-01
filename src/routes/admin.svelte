@@ -205,7 +205,7 @@
 			/>
 		{/each}
 	</div>
-	<div id="right">
+	<div id="center">
 		{#if registrations}
 			<h2>Registrations <button id="copy" on:click={copy}>Copy</button></h2>
 			{#if courseID}
@@ -234,11 +234,13 @@
 						<span>
 							<button class="strikeBtn" on:click={() => toggleStrike(reg.key)}>
 								{#if reg.suspectedStrike}
-									Remove Strike
+									🤬
 								{:else}
-									Strike User
+									😇
 								{/if}
 							</button>
+						</span>
+						<span>
 							<button class="registrationButton" on:click={() => deleteRegistaration(reg.key)}>
 								Cancel
 							</button>
@@ -248,15 +250,16 @@
 			</table>
 		{:else}Select a course.{/if}
 	</div>
-</div>
-
-<h2>Strikes</h2>
-{#each strikes as strike}
-	<div>
-		<span>{strike.name} </span>
-		<span>{format(strike.date)} </span>
+	<div id="right">
+		<h2>Strikes</h2>
+		{#each strikes as strike}
+			<div>
+				<span>{strike.name} </span>
+				<span>{format(strike.date)} </span>
+			</div>
+		{/each}
 	</div>
-{/each}
+</div>
 
 {#if showOverlay}
 	<CourseCreator on:submit={createCourse} on:close={toggleOverlay} />
@@ -283,9 +286,14 @@
 	}
 
 	#left,
-	#right {
+	#center {
 		flex: 1 1 500px;
 		max-width: 500px;
+	}
+
+	#right {
+		flex: 1 1 150px;
+		max-width: 150px;
 	}
 
 	#left {
@@ -319,6 +327,7 @@
 	}
 
 	.registrationButton,
+	.strikeBtn,
 	#copy {
 		background: black;
 		color: white;
