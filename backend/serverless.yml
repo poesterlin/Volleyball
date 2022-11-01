@@ -85,6 +85,24 @@ functions:
           cors: true
           authorizer: verify-token
 
+  clear_strike:
+    handler: registration-handler.clearStrike
+    events:
+      - http:
+          method: GET
+          path: registration/clear-strike
+          cors: true
+          authorizer: verify-token
+
+  strikes:
+    handler: registration-handler.getStrikes
+    events:
+      - http:
+          method: GET
+          path: strikes
+          cors: true
+          authorizer: verify-token
+
   # registrations
   get_registration:
     handler: registration-handler.get

@@ -8,6 +8,8 @@ try {
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const { randomUUID } = require('crypto');
+var stringSimilarity = require("string-similarity");
+
 const { respond, connectDB, inNDays, endOfDay, sendEmail } = require('./helpers');
 
 const webpush = require('web-push');
@@ -15,7 +17,7 @@ const publicVapidKey = process.env.VAPID_PUBLIC;
 const privateVapidKey = process.env.VAPID_PRIVATE;
 webpush.setVapidDetails('https://volleyballhtwg.netlify.app', publicVapidKey, privateVapidKey);
 
-const regSchema = new Schema({ registered: Date, name: String, waitlist: Boolean, key: String, email: String, _course: { type: Schema.Types.ObjectId, ref: 'Course' } });
+const regSchema = new Schema({ registered: Date, name: String, suspectedStrike: Boolean, waitlist: Boolean, key: String, email: String, _course: { type: Schema.Types.ObjectId, ref: 'Course' } });
 
 regSchema.pre('remove', { document: true, query: false }, async function () {
     const reg = this;
@@ -28,6 +30,11 @@ const Registration = mongoose.model('Registration', regSchema);
 const Course = mongoose.model('Course', new Schema({ name: String, location: String, spots: Number, time: String, duration: Number, date: Date, registered: [{ type: Schema.Types.ObjectId, ref: 'Registration' }] }));
 // @ts-ignore
 const Notification = mongoose.model('Notification', new Schema({ subscription: Object }));
+
+// @ts-ignore
+const Strike = mongoose.model('Strike', new Schema({ name: String, date: Date }));
+
+
 
 module.exports.get = async function (event, context) {
     const regKey = decodeURIComponent(event.queryStringParameters.regKey);
@@ -92,10 +99,13 @@ module.exports.cancel = async function (event, context) {
         nextInLine.email = undefined;
         await nextInLine.save();
     }
+    const striked = await addStrike(registration.name, course.date, course.time)
     await registration.delete();
 
-    return respond({ message: "canceled" });
+    return respond({ message: "canceled", striked });
 }
+
+
 
 module.exports.registerTrainer = async function (event, context) {
     await connectDB();
@@ -225,12 +235,14 @@ module.exports.create = async function (event, context) {
 
     await connectDB();
     // Check if name and key was submitted before
-    if (lastKey) {
-        const lastReg = await Registration.findOne({ key: lastKey, name, course });
-        if (lastReg) {
-            return respond({ registration: { ...lastReg.toObject(), registeredTwice: true } });
-        }
-    }
+    // if (lastKey) {
+    //     const lastReg = await Registration.findOne({ key: lastKey, name, course });
+    //     if (lastReg) {
+    //         return respond({ registration: { ...lastReg.toObject(), registeredTwice: true } });
+    //     }
+    // }
+
+    const suspectedStrike = await hasStrike(name);
 
     const registeredCourse = await Course.findById(course).exec();
     if (!registeredCourse) {
@@ -240,11 +252,86 @@ module.exports.create = async function (event, context) {
     // generate registration key
     // TODO: change encoding to base64url
     const key = Buffer.from(randomUUID(), "hex").toString("base64").replace(/=/gm, "").replace(/\+/gm, "-");
-    
-    const waitlist = registeredCourse.spots <= registeredCourse.registered.length;
-    const registration = await new Registration({ registered: new Date(), name, waitlist, key, _course: registeredCourse._id }).save();
+
+    const waitlist = suspectedStrike || registeredCourse.spots <= registeredCourse.registered.length;
+    const registration = await new Registration({ registered: new Date(), suspectedStrike, name, waitlist, key, _course: registeredCourse._id }).save();
     registeredCourse.registered.push(registration._id);
 
     await registeredCourse.save();
     return respond({ registration });
+}
+
+/**
+ * 
+ * @param {string} name 
+ * @param {Date} curseDate 
+ * @param {string} curseTime 
+ */
+async function addStrike(name, curseDate, curseTime) {
+    try {
+        const [h, m] = curseTime.split(":");
+        const time = curseDate.setHours(parseInt(h), parseInt(m));
+
+        const cutoff = 1 * 60 * 60 * 1000;
+
+        const tooClose = time - Date.now() < cutoff;
+
+        if (tooClose) {
+            await new Strike({ name, date: new Date() }).save();
+        }
+
+        return tooClose;
+    } catch (error) {
+        console.log(error);
+        return false;
+    }
+}
+module.exports.getStrikes = async function (event, context) {
+    await connectDB();
+    const strikes = await Strike.find()
+    return respond({ strikes });
+}
+
+module.exports.clearStrike = async function (event, context) {
+    const regKey = decodeURIComponent(event.queryStringParameters.regKey);
+
+    if (!regKey) {
+        return respond({ message: "error" }, 400);
+    }
+
+    await connectDB();
+    const registration = await Registration.findOne({ key: regKey }).populate("_course");
+
+    if (!registration) {
+        return respond({ message: "no registration found" }, 404);
+    }
+    const nowStriked = !registration.suspectedStrike;
+
+    if (nowStriked) {
+        await new Strike({ name: registration.name, date: new Date() }).save();
+    }
+
+    const registeredCourse = registration._course;
+    const waitlist = nowStriked || registeredCourse.spots < registeredCourse.registered.length;
+    await Registration.findOneAndUpdate({ key: regKey }, { suspectedStrike: nowStriked, waitlist });
+    return respond({ message: "cleared" });
+}
+
+
+/**
+ * 
+ * @param {string} name 
+ */
+async function hasStrike(name) {
+    try {
+        const strikes = await Strike.find({ date: { $gt: inNDays(-7) }});
+
+        const match = strikes
+            .map(s => stringSimilarity.compareTwoStrings(s.name, name));
+
+        return Math.max(...match) > 0.9;
+    } catch (error) {
+        console.log(error);
+        return false;
+    }
 }

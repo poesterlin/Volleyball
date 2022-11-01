@@ -52,6 +52,8 @@ exports.auth = function (event, context, callback) {
   policy.allowMethod(AuthPolicy.HttpVerb.POST, "courses");
   policy.allowMethod(AuthPolicy.HttpVerb.DELETE, "courses");
   policy.allowMethod(AuthPolicy.HttpVerb.GET, "courses/details");
+  policy.allowMethod(AuthPolicy.HttpVerb.GET, "registration/clear-strike");
+  policy.allowMethod(AuthPolicy.HttpVerb.GET, "strikes");
 
   callback(null, policy.build());
 };
