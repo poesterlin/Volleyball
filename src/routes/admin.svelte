@@ -11,6 +11,7 @@
 	let courses = [];
 	let courseID;
 	let registrations = [];
+	let strikes = [];
 	let showOverlay = false;
 	let loading = false;
 	let preRegisterName = '';
@@ -50,9 +51,13 @@
 
 	async function fetchCourses(load = true) {
 		loading = load;
+		
 		const res = await fetch(server + '/courses/details', { headers }).then((r) => r.json());
-
 		courses = res.courses || [];
+
+		const res2 = await fetch(server + '/strikes', { headers }).then((r) => r.json());
+		strikes = res2.strikes || [];
+
 		loading = false;
 	}
 
@@ -243,6 +248,13 @@
 			</table>
 		{:else}Select a course.{/if}
 	</div>
+
+	{#each strikes as strike}
+		<div>
+			<span>{strike.name} </span>
+			<span>format({strike.date}) </span>
+		</div>
+	{/each}
 </div>
 
 {#if showOverlay}
