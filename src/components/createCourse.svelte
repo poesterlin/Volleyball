@@ -2,6 +2,7 @@
 	import { daysOfWeek, humanReadableDate, monthsOfYear, addDays } from '../helpers/date';
 	import Datepicker from 'svelte-calendar';
 	import { createEventDispatcher } from 'svelte';
+	import { nextMonday, nextSaturday, nextThursday, nextTuesday, nextWednesday } from 'date-fns';
 	const dispatch = createEventDispatcher();
 
 	const difficulties = [
@@ -32,7 +33,9 @@
 				location: 'Ellenrieder Sporthalle',
 				spots: 18,
 				time: '17:30',
-				duration: 1.5
+				duration: 1.5,
+				date: nextMonday(new Date()),
+				publishOn: nextThursday(new Date())
 			}
 		},
 		{
@@ -42,7 +45,9 @@
 				location: 'Ellenrieder Sporthalle',
 				spots: 18,
 				time: '19:00',
-				duration: 1.5
+				duration: 1.5,
+				date: nextMonday(new Date()),
+				publishOn: nextThursday(new Date())
 			}
 		},
 		{
@@ -52,7 +57,9 @@
 				location: 'Ellenrieder Sporthalle',
 				spots: 18,
 				time: '20:30',
-				duration: 1.5
+				duration: 1.5,
+				date: nextMonday(new Date()),
+				publishOn: nextThursday(new Date())
 			}
 		},
 		{
@@ -62,7 +69,9 @@
 				location: 'Ellenrieder Sporthalle',
 				spots: 18,
 				time: '20:30',
-				duration: 1.5
+				duration: 1.5,
+				date: nextWednesday(new Date()),
+				publishOn: nextThursday(new Date())
 			}
 		},
 		{
@@ -72,7 +81,9 @@
 				location: 'Petershausener Sporthalle',
 				spots: 36,
 				time: '12:00',
-				duration: 1.5
+				duration: 1.5,
+				date: nextSaturday(new Date()),
+				publishOn: nextTuesday(new Date())
 			}
 		}
 	];
