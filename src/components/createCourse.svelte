@@ -4,7 +4,15 @@
 	import { createEventDispatcher } from 'svelte';
 	const dispatch = createEventDispatcher();
 
-	const difficulties = ['Beginner', 'Advanced', 'Actives', 'Beach Course', 'Actives - 5:1 System', 'Free Game', "Christmas Special🎄"];
+	const difficulties = [
+		'Beginner',
+		'Advanced',
+		'Actives',
+		'Beach Course',
+		'Actives - 5:1 System',
+		'Free Game',
+		'Christmas Special🎄'
+	];
 
 	let course = {
 		name: 'Volleyball - ',
@@ -13,14 +21,78 @@
 		time: '20:30',
 		duration: 1.5,
 		date: addDays(new Date(), 7),
-		publishOn: new Date(),
+		publishOn: new Date()
 	};
+
+	let defaults = [
+		{
+			name: difficulties[0],
+			settings: {
+				name: difficulties[0],
+				location: 'Ellenrieder Sporthalle',
+				spots: 18,
+				time: '17:30',
+				duration: 1.5
+			}
+		},
+		{
+			name: difficulties[1],
+			settings: {
+				name: difficulties[1],
+				location: 'Ellenrieder Sporthalle',
+				spots: 18,
+				time: '19:00',
+				duration: 1.5
+			}
+		},
+		{
+			name: difficulties[2],
+			settings: {
+				name: difficulties[2],
+				location: 'Ellenrieder Sporthalle',
+				spots: 18,
+				time: '20:30',
+				duration: 1.5
+			}
+		},
+		{
+			name: difficulties[4],
+			settings: {
+				name: difficulties[4],
+				location: 'Ellenrieder Sporthalle',
+				spots: 18,
+				time: '20:30',
+				duration: 1.5
+			}
+		},
+		{
+			name: difficulties[5],
+			settings: {
+				name: difficulties[5],
+				location: 'Petershausener Sporthalle',
+				spots: 36,
+				time: '12:00',
+				duration: 1.5
+			}
+		}
+	];
+
+	function applyDefault(settings) {
+		Object.keys(settings).forEach((key) => {
+			course[key] = settings[key];
+		});
+	}
 </script>
 
 <div id="overlay" on:click|self={() => dispatch('close')}>
 	<div id="inner">
 		<button id="close" on:click={() => dispatch('close')}>X</button>
 		<h3>Create a Course:</h3>
+		<div id="defaults">
+			{#each defaults as setting}
+				<button on:click={() => applyDefault(setting.settings)}>{setting.name}</button>
+			{/each}
+		</div>
 		<p>
 			<label for="titel">Titel</label>
 			<!-- <input type="text" bind:value={course.name} placeholder="Titel" id="titel" /> -->
@@ -57,23 +129,23 @@
 		<p>
 			<label for="">Date:</label>
 			<Datepicker
-			{daysOfWeek}
-			{monthsOfYear}
-			start={new Date()}
-			startOfWeekIndex={1}
-			bind:selected={course.date}
-			format={humanReadableDate}
+				{daysOfWeek}
+				{monthsOfYear}
+				start={new Date()}
+				startOfWeekIndex={1}
+				bind:selected={course.date}
+				format={humanReadableDate}
 			/>
 		</p>
 		<p>
 			<label for="">Publish on:</label>
 			<Datepicker
-			{daysOfWeek}
-			{monthsOfYear}
-			start={addDays(new Date(), -7)}
-			startOfWeekIndex={1}
-			bind:selected={course.publishOn}
-			format={humanReadableDate}
+				{daysOfWeek}
+				{monthsOfYear}
+				start={addDays(new Date(), -7)}
+				startOfWeekIndex={1}
+				bind:selected={course.publishOn}
+				format={humanReadableDate}
 			/>
 		</p>
 		<button on:click={() => dispatch('submit', course)}>Create</button>
@@ -100,7 +172,7 @@
 		display: flex;
 		flex-wrap: wrap;
 		justify-content: center;
-		width: 350px;
+		width: 400px;
 	}
 
 	p {
@@ -140,5 +212,23 @@
 		border-radius: 15px;
 		font-weight: bold;
 		cursor: pointer;
+	}
+
+	#defaults {
+		display: flex;
+		gap: 7px;
+		background: #e4dfdf;
+		padding: 6px;
+		margin: 0 -20px 7px;
+		opacity: 0.9;
+	}
+	h3 {
+		background: cadetblue;
+		width: calc(100% + 40px);
+		margin: -20px;
+		margin-bottom: 0;
+		color: white;
+		text-align: center;
+		padding: 20px;
 	}
 </style>
