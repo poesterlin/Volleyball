@@ -2,7 +2,7 @@
 	import { daysOfWeek, humanReadableDate, monthsOfYear, addDays } from '../helpers/date';
 	import Datepicker from 'svelte-calendar';
 	import { createEventDispatcher } from 'svelte';
-	import { nextMonday, nextSaturday, nextFriday, nextTuesday, nextWednesday } from 'date-fns';
+	import { nextMonday, nextSaturday, nextThursday, nextTuesday, nextWednesday } from 'date-fns';
 	const dispatch = createEventDispatcher();
 
 	const difficulties = [
@@ -35,7 +35,7 @@
 				time: '17:30',
 				duration: 1.5,
 				date: nextMonday(new Date()),
-				publishOn: nextFriday(new Date())
+				publishOn: nextThursday(new Date())
 			}
 		},
 		{
@@ -47,7 +47,7 @@
 				time: '19:00',
 				duration: 1.5,
 				date: nextMonday(new Date()),
-				publishOn: nextFriday(new Date())
+				publishOn: nextThursday(new Date())
 			}
 		},
 		{
@@ -59,7 +59,7 @@
 				time: '20:30',
 				duration: 1.5,
 				date: nextMonday(new Date()),
-				publishOn: nextFriday(new Date())
+				publishOn: nextThursday(new Date())
 			}
 		},
 		{
@@ -71,7 +71,7 @@
 				time: '20:30',
 				duration: 1.5,
 				date: nextWednesday(new Date()),
-				publishOn: nextFriday(new Date())
+				publishOn: nextThursday(new Date())
 			}
 		},
 		{
@@ -83,7 +83,7 @@
 				time: '12:00',
 				duration: 1.5,
 				date: nextSaturday(addDays(new Date(), 7)),
-				publishOn: nextFriday(new Date())
+				publishOn: nextThursday(new Date())
 			}
 		}
 	];
