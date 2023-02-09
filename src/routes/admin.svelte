@@ -107,7 +107,8 @@
 			day: 'numeric',
 			minute: 'numeric',
 			hour: 'numeric',
-			second: 'numeric'
+			second: 'numeric',
+			fractionalSecondDigits: 1
 		}).format(new Date(date));
 	}
 
