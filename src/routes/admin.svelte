@@ -106,7 +106,8 @@
 			month: 'numeric',
 			day: 'numeric',
 			minute: 'numeric',
-			hour: 'numeric'
+			hour: 'numeric',
+			second: 'numeric'
 		}).format(new Date(date));
 	}
 
