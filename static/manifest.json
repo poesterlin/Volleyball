@@ -12,6 +12,11 @@
           "src": "/favicon.png",
           "type": "image/png",
           "sizes": "144x144"
+        },
+        {
+          "src": "/Volleyball_icon.png",
+          "type": "image/png",
+          "sizes": "512x512"
         }
     ],
     "url_handlers": [
