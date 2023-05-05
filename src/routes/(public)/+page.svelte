@@ -102,7 +102,6 @@
 		on:keyup={isEnter}
 		name="name"
 		bind:value={name}
-		use:focus
 	/>
 	<div id="list">
 		{#each blocks as block, i}
