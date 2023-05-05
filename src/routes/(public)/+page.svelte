@@ -126,7 +126,7 @@
 	main {
 		display: flex;
 		flex-direction: column;
-		margin: 5dvh auto 20dvh;
+		margin: 5dvh auto 15dvh;
 		width: 90vw;
 		max-width: 700px;
 		box-sizing: border-box;
