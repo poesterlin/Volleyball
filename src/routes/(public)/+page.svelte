@@ -1,13 +1,13 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { humanReadableDate } from '../helpers/date';
+	import { humanReadableDate } from '$lib/helpers/date';
 	import { onMount } from 'svelte';
-	import RegisteredOverlay from '../components/registeredOverlay.svelte';
-	import Course from '../components/course.svelte';
-	import Loading from '../components/loading.svelte';
-	import { server } from '../helpers/env';
+	import RegisteredOverlay from '$lib/components/registeredOverlay.svelte';
+	import Course from '$lib/components/course.svelte';
+	import Loading from '$lib/components/loading.svelte';
+	import { server } from '$lib/helpers/env';
 
-	let blocks = [];
+	let blocks: any[] = [];
 	let name: string;
 	let triedToSend = false;
 	let registration;
@@ -63,7 +63,7 @@
 
 		localStorage.setItem('lastKey', res.registration.key);
 
-		const storedKeys = JSON.parse(localStorage.getItem('keys')) || [];
+		const storedKeys = JSON.parse(localStorage.getItem('keys')!) || [];
 		storedKeys.push({
 			key: res.registration.key,
 			date: blocks.flatMap((b) => b.courses).find((c) => c._id === courseID).date
@@ -94,7 +94,14 @@
 	{#if !canSend && triedToSend}
 		<label class="red" for="name">Make sure to include your last name.</label>
 	{/if}
-	<input type="text" autocomplete="name" placeholder="Name" on:keyup={isEnter} name="name" bind:value={name} />
+	<input
+		type="text"
+		autocomplete="name"
+		placeholder="Name"
+		on:keyup={isEnter}
+		name="name"
+		bind:value={name}
+	/>
 	<div id="list">
 		{#each blocks as block, i}
 			<span>{humanReadableDate(block.date)}</span>
@@ -118,12 +125,7 @@
 	{/if}
 </main>
 
-<style lang="scss">
-	@use '../helpers/theme' as *;
-	@use 'sass:color';
-
-	$padding: 5px;
-
+<style>
 	span {
 		font-size: 14px;
 		font-weight: bold;
@@ -138,16 +140,16 @@
 		margin: 60px 20% 50px;
 		height: 2px;
 		opacity: 0.4;
-		background: linear-gradient(90deg, $c80 0%, $c40 50%, $c80 100%);
+		background: linear-gradient(90deg, var(--c80) 0%, var(--c40) 50%, var(--c80) 100%);
 	}
 
 	main {
 		display: flex;
 		flex-direction: column;
-		margin: 5vh auto;
+		margin: 5dvh auto 20dvh;
 		width: 90vw;
 		max-width: 700px;
-		min-height: 100vh;
+		box-sizing: border-box;
 	}
 
 	input {
@@ -156,7 +158,7 @@
 		margin: 0 0 20px 0;
 		padding: 5px;
 		border-radius: 10px;
-		border: 3px solid $cAccent;
+		border: 3px solid var(--cAccent);
 		height: 48px;
 	}
 
@@ -170,11 +172,11 @@
 		margin-bottom: 4vh;
 	}
 
-	button {
+	button#register {
 		display: block;
-		margin: 15px auto;
+		margin: 15px auto 30px;
 		padding: 1em 3em;
-		background: $cAccent;
+		background: var(--cAccent);
 		color: white;
 		border: 0;
 		border-radius: 80px;
@@ -184,9 +186,9 @@
 	}
 
 	button.disabled {
-		border: 2px solid $c40;
-		background-color: $c100;
-		color: $c80;
+		border: 2px solid var(--c40);
+		background-color: var(--c100);
+		color: var(--c80);
 		cursor: no-drop;
 		box-shadow: unset;
 	}

@@ -1,5 +1,6 @@
 <script>
 	import { daysOfWeek, humanReadableDate, monthsOfYear, addDays } from '../helpers/date';
+	// @ts-ignore
 	import Datepicker from 'svelte-calendar';
 	import { createEventDispatcher } from 'svelte';
 	import { nextMonday, nextSaturday, nextThursday, nextTuesday, nextWednesday } from 'date-fns';
@@ -166,10 +167,7 @@
 <style>
 	div#overlay {
 		position: fixed;
-		top: 0;
-		bottom: 0;
-		right: 0;
-		left: 0;
+		inset: 0;
 		display: flex;
 		justify-content: center;
 		align-items: center;
