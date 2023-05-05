@@ -6,6 +6,7 @@
 	import Course from '$lib/components/course.svelte';
 	import Loading from '$lib/components/loading.svelte';
 	import { server } from '$lib/helpers/env';
+	import { focus } from '$lib/helpers/focus';
 
 	let blocks: any[] = [];
 	let name: string;
@@ -101,6 +102,7 @@
 		on:keyup={isEnter}
 		name="name"
 		bind:value={name}
+		use:focus
 	/>
 	<div id="list">
 		{#each blocks as block, i}
@@ -167,9 +169,15 @@
 	}
 
 	#list {
-		max-height: 40vh;
+		max-height: 50dvh;
 		overflow-y: auto;
 		margin-bottom: 4vh;
+	}
+
+	@media screen and (max-height: 600px) {
+		#list {
+			max-height: 40dvh;
+		}
 	}
 
 	button#register {

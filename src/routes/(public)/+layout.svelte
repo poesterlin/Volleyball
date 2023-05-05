@@ -40,12 +40,6 @@
 		box-sizing: border-box;
 	}
 
-	@media screen and (max-width: 400px) {
-		span {
-			display: none;
-		}
-	}
-
 	a {
 		display: flex;
 		height: 30px;
@@ -59,6 +53,21 @@
 		border: 3px solid var(--c100);
 		border-radius: 5px;
 		box-shadow: 2px 2px 3px hsla(0, 0%, 33%, 0.4);
+	}
+
+	@media screen and (max-width: 400px) {
+		span {
+			display: none;
+		}
+	}
+
+	@media screen and (max-height: 600px) {
+		footer {
+			padding: 6px;
+		}
+		a {
+			padding: 10px;
+		}
 	}
 
 	svg {
