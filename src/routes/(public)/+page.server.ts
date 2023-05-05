@@ -22,9 +22,8 @@ export const load = (async () => {
             date,
             courses: sanitized.filter((c) => c.date!.toDateString() === date)
         }));
-
         return { blocks };
     } catch (err: any) {
-        throw error(500, err);
+        throw error(500, JSON.stringify(err) + " +++ error");
     }
 });

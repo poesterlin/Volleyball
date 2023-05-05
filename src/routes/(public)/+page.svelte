@@ -14,9 +14,8 @@
 	let loading = false;
 
 	export let data;
-
-	if (data.blocks.flatMap((b) => b.courses).length === 1) {
-		courseID = data.blocks.flatMap((b) => b.courses)[0]._id;
+	if (data.blocks?.flatMap((b) => b.courses).length === 1) {
+		courseID = data.blocks?.flatMap((b) => b.courses)[0]._id;
 	}
 
 	const minTextLength = 4;
@@ -45,7 +44,7 @@
 		const storedKeys = JSON.parse(localStorage.getItem('keys')!) || [];
 		storedKeys.push({
 			key: res.registration.key,
-			date: data.blocks.flatMap((b) => b.courses).find((c) => c._id === courseID)!.date
+			date: data.blocks?.flatMap((b) => b.courses).find((c) => c._id === courseID)!.date
 		});
 		localStorage.setItem('keys', JSON.stringify(storedKeys));
 
@@ -68,7 +67,6 @@
 </script>
 
 <Loading {loading} />
-<pre>{data.err}</pre>
 <main>
 	{#if !canSend && triedToSend}
 		<label class="red" for="name">Make sure to include your last name.</label>
@@ -82,7 +80,7 @@
 		bind:value={name}
 	/>
 	<div id="list">
-		{#each data.blocks as block, i}
+		{#each data.blocks ?? [] as block, i}
 			<span>{humanReadableDate(block.date)}</span>
 			{#each block.courses as course}
 				<Course
@@ -91,11 +89,11 @@
 					selected={course._id === courseID}
 				/>
 			{/each}
-			{#if i < data.blocks.length - 1}
+			{#if i < data.blocks?.length - 1}
 				<div class="line" />
 			{/if}
 		{/each}
-		{#if data.blocks.length === 0}There are currently no courses. ☹{/if}
+		{#if data.blocks?.length === 0}There are currently no courses. ☹{/if}
 	</div>
 
 	<button id="register" on:click={send} class:disabled={!canSend}>Register</button>
