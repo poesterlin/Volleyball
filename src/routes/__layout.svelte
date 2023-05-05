@@ -1,6 +1,18 @@
 <script>
 	import { page } from '$app/stores';
 
+	import * as Sentry from '@sentry/browser';
+
+	Sentry.init({
+		dsn: 'https://85cdfcf11ffe4ab1b7ef383e33b29945@o4505130185261056.ingest.sentry.io/4505130186440704',
+		integrations: [new Sentry.BrowserTracing()],
+
+		// Set tracesSampleRate to 1.0 to capture 100%
+		// of transactions for performance monitoring.
+		// We recommend adjusting this value in production
+		tracesSampleRate: 1.0
+	});
+
 	$: segment = $page.path.substr(1);
 
 	let innerWidth = 800;

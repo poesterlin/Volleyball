@@ -17,6 +17,7 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@sentry/browser": "^7.51.0",
 		"date-fns": "^2.27.0",
 		"jwt-decode": "^3.1.2",
 		"svelte-calendar": "^2.0.4"
