@@ -6,19 +6,24 @@ export const load = (async () => {
     try {
         await connectDB();
 
-        const courses = await DB.Course.find({
-            publishOn: {
-                $lt: new Date()
-            }
-        }).sort({ date: 1, time: 1 });
-        return {
-            courses: courses.map((c) => {
-                const resp = c.toObject();
-                resp._id = c._id.toString();
-                resp.registered = resp.registered.length as any;
-                return resp;
-            })
-        };
+        const courses = await DB.Course.find({ publishOn: { $lt: new Date() } }).sort({ date: 1, time: 1 });
+
+        const sanitized = courses.map((c) => {
+            const resp = c.toObject();
+            resp._id = c._id.toString();
+            resp.registered = resp.registered.length as any;
+            resp.date = new Date(c.date!);
+            return resp;
+        });
+
+        const dates = sanitized.reduce((map, c) => map.set(c.date!.toDateString(), true), new Map());
+
+        const blocks = Array.from(dates.keys()).map((date) => ({
+            date,
+            courses: sanitized.filter((c) => c.date!.toDateString() === date)
+        }));
+
+        return { blocks };
     } catch (err: any) {
         console.error(err);
         throw error(500, err.toString())

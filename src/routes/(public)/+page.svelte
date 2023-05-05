@@ -1,13 +1,11 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { humanReadableDate } from '$lib/helpers/date';
-	import { onMount } from 'svelte';
 	import RegisteredOverlay from '$lib/components/registeredOverlay.svelte';
 	import Course from '$lib/components/course.svelte';
 	import Loading from '$lib/components/loading.svelte';
 	import { server } from '$lib/helpers/env';
 
-	let blocks: any[] = [];
 	let name: string;
 	let triedToSend = false;
 	let registration;
@@ -16,32 +14,10 @@
 	let loading = false;
 
 	export let data;
-	processCourses(data.courses);
 
-	onMount(async () => {
-		await update();
-	});
 
-	async function update() {
-		let { courses } = await fetch(server + '/courses').then((r) => r.json());
-		processCourses(courses);
-	}
-
-	function processCourses(courses: any[]) {
-		courses.forEach((course) => {
-			course.date = new Date(course.date);
-		});
-
-		const dates = courses.reduce((map, c) => map.set(c.date.toDateString()), new Map());
-
-		blocks = Array.from(dates.keys()).map((date) => ({
-			date,
-			courses: courses.filter((c) => c.date.toDateString() === date)
-		}));
-
-		if (blocks.flatMap((b) => b.courses).length === 1) {
-			courseID = blocks.flatMap((b) => b.courses)[0]._id;
-		}
+	if (data.blocks.flatMap((b) => b.courses).length === 1) {
+		courseID = data.blocks.flatMap((b) => b.courses)[0]._id;
 	}
 
 	const minTextLength = 4;
@@ -70,7 +46,7 @@
 		const storedKeys = JSON.parse(localStorage.getItem('keys')!) || [];
 		storedKeys.push({
 			key: res.registration.key,
-			date: blocks.flatMap((b) => b.courses).find((c) => c._id === courseID).date
+			date: data.blocks.flatMap((b) => b.courses).find((c) => c._id === courseID)!.date
 		});
 		localStorage.setItem('keys', JSON.stringify(storedKeys));
 
@@ -107,7 +83,7 @@
 		bind:value={name}
 	/>
 	<div id="list">
-		{#each blocks as block, i}
+		{#each data.blocks as block, i}
 			<span>{humanReadableDate(block.date)}</span>
 			{#each block.courses as course}
 				<Course
@@ -116,11 +92,11 @@
 					selected={course._id === courseID}
 				/>
 			{/each}
-			{#if i < blocks.length - 1}
+			{#if i < data.blocks.length - 1}
 				<div class="line" />
 			{/if}
 		{/each}
-		{#if blocks.length === 0}There are currently no courses. ☹{/if}
+		{#if data.blocks.length === 0}There are currently no courses. ☹{/if}
 	</div>
 
 	<button id="register" on:click={send} class:disabled={!canSend}>Register</button>

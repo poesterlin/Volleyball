@@ -32,21 +32,21 @@ const notificationSchema = new Schema({ subscription: Object });
 const strikeSchema = new Schema({ name: String, date: Date })
 
 export class DB {
-    private static _registration = mongoose.models.Registration ?? mongoose.model('Registration', registrationSchema, "Volleyball", { overwriteModels: true });
-    private static _course = mongoose.models.Course ?? mongoose.model('Course', courseSchema, "Volleyball", { overwriteModels: true });
-    private static _notification = mongoose.models.Notification ?? mongoose.model('Notification', notificationSchema, "Volleyball", { overwriteModels: true });
-    private static _strike = mongoose.models.Strike ?? mongoose.model('Strike', strikeSchema, "Volleyball", { overwriteModels: true });
+    private static _registration = mongoose.model('Registration', registrationSchema, "registrations", { overwriteModels: true });
+    private static _course = mongoose.model('Course', courseSchema, "courses", { overwriteModels: true });
+    private static _notification = mongoose.model('Notification', notificationSchema, "notifications", { overwriteModels: true });
+    private static _strike = mongoose.model('Strike', strikeSchema, "strikes", { overwriteModels: true });
 
     static get Registration() {
-        return mongoose.models.Registration ?? DB._registration;
+        return DB._registration;
     }
     static get Course() {
-        return mongoose.models.Course ?? DB._course;
+        return DB._course;
     }
     static get Notification() {
-        return mongoose.models.Notification ?? DB._notification;
+        return DB._notification;
     }
     static get Strike() {
-        return mongoose.models.Strike ?? DB._strike;
+        return DB._strike;
     }
 }
