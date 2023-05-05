@@ -6,7 +6,6 @@
 	import Course from '$lib/components/course.svelte';
 	import Loading from '$lib/components/loading.svelte';
 	import { server } from '$lib/helpers/env';
-	import { focus } from '$lib/helpers/focus';
 
 	let blocks: any[] = [];
 	let name: string;
@@ -16,26 +15,30 @@
 	let showOverlay = false;
 	let loading = false;
 
+	export let data;
+	processCourses(data.courses);
+
 	onMount(async () => {
 		await update();
 	});
 
 	async function update() {
-		loading = true;
-		let { courses: res } = await fetch(server + '/courses').then((r) => r.json());
+		let { courses } = await fetch(server + '/courses').then((r) => r.json());
+		processCourses(courses);
+	}
 
-		res.forEach((course) => {
+	function processCourses(courses: any[]) {
+		courses.forEach((course) => {
 			course.date = new Date(course.date);
 		});
 
-		const dates = (res as any[]).reduce((map, c) => map.set(c.date.toDateString()), new Map());
+		const dates = courses.reduce((map, c) => map.set(c.date.toDateString()), new Map());
 
 		blocks = Array.from(dates.keys()).map((date) => ({
 			date,
-			courses: res.filter((c) => c.date.toDateString() === date)
+			courses: courses.filter((c) => c.date.toDateString() === date)
 		}));
 
-		loading = false;
 		if (blocks.flatMap((b) => b.courses).length === 1) {
 			courseID = blocks.flatMap((b) => b.courses)[0]._id;
 		}

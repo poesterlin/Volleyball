@@ -13,6 +13,7 @@
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "^2.0.0",
+		"@sveltejs/adapter-netlify": "^1.0.0-next.88",
 		"@sveltejs/kit": "^1.5.0",
 		"prettier": "^2.8.0",
 		"prettier-plugin-svelte": "^2.8.1",
@@ -27,7 +28,10 @@
 	"dependencies": {
 		"@sentry/browser": "^7.51.0",
 		"date-fns": "^2.27.0",
+		"jsonwebtoken": "^9.0.0",
 		"jwt-decode": "^3.1.2",
+		"lucia-auth": "^1.5.0",
+		"mongoose": "^7.1.0",
 		"svelte-calendar": "^2.0.4"
 	}
 }
