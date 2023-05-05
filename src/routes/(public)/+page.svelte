@@ -15,7 +15,6 @@
 
 	export let data;
 
-
 	if (data.blocks.flatMap((b) => b.courses).length === 1) {
 		courseID = data.blocks.flatMap((b) => b.courses)[0]._id;
 	}
@@ -69,7 +68,7 @@
 </script>
 
 <Loading {loading} />
-
+<pre>{data.err}</pre>
 <main>
 	{#if !canSend && triedToSend}
 		<label class="red" for="name">Make sure to include your last name.</label>

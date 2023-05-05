@@ -26,6 +26,6 @@ export const load = (async () => {
         return { blocks };
     } catch (err: any) {
         console.error(err);
-        throw error(500, err.toString())
+        return { blocks: [], err };
     }
 });
