@@ -12,7 +12,7 @@ const registrationSchema = new Schema({
 
 registrationSchema.pre('deleteOne', { document: true, query: false }, async function (this) {
     const reg = this;
-    await DbSchema.Course.findByIdAndUpdate(reg._course, { $pullAll: { registered: [reg._id] } });
+    await DB.Course.findByIdAndUpdate(reg._course, { $pullAll: { registered: [reg._id] } });
 });
 
 const courseSchema = new Schema({
@@ -31,22 +31,22 @@ const courseSchema = new Schema({
 const notificationSchema = new Schema({ subscription: Object });
 const strikeSchema = new Schema({ name: String, date: Date })
 
-export class DbSchema {
-    private static _registration = mongoose.models.Registration ?? mongoose.model('Registration', registrationSchema)
-    private static _course = mongoose.models.Course ?? mongoose.model('Course', courseSchema)
-    private static _notification = mongoose.models.Notification ?? mongoose.model('Notification', notificationSchema)
-    private static _strike = mongoose.models.Strike ?? mongoose.model('Strike', strikeSchema)
+export class DB {
+    private static _registration = mongoose.models.Registration ?? mongoose.model('Registration', registrationSchema, "Volleyball", { overwriteModels: true });
+    private static _course = mongoose.models.Course ?? mongoose.model('Course', courseSchema, "Volleyball", { overwriteModels: true });
+    private static _notification = mongoose.models.Notification ?? mongoose.model('Notification', notificationSchema, "Volleyball", { overwriteModels: true });
+    private static _strike = mongoose.models.Strike ?? mongoose.model('Strike', strikeSchema, "Volleyball", { overwriteModels: true });
 
     static get Registration() {
-        return mongoose.models.Registration ?? DbSchema._registration;
+        return mongoose.models.Registration ?? DB._registration;
     }
     static get Course() {
-        return mongoose.models.Course ?? DbSchema._course;
+        return mongoose.models.Course ?? DB._course;
     }
     static get Notification() {
-        return mongoose.models.Notification ?? DbSchema._notification;
+        return mongoose.models.Notification ?? DB._notification;
     }
     static get Strike() {
-        return mongoose.models.Strike ?? DbSchema._strike;
+        return mongoose.models.Strike ?? DB._strike;
     }
 }
