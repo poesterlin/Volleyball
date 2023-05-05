@@ -1,17 +1,17 @@
-<script>
-	import { dev } from '$app/env';
+<script lang="ts">
+	import { dev } from '$app/environment';
 	import { goto } from '$app/navigation';
-	import { server } from '../helpers/env';
+	import { server } from '$lib/helpers/env';
 	import { onMount } from 'svelte';
-	import authHelper from '../helpers/auth-helper';
-	import Course from '../components/course.svelte';
-	import CourseCreator from '../components/createCourse.svelte';
+	import authHelper from '$lib/helpers/auth-helper';
+	import Course from '$lib/components/course.svelte';
+	import CourseCreator from '$lib/components/createCourse.svelte';
 
-	let store;
-	let courses = [];
-	let courseID;
-	let registrations = [];
-	let strikes = [];
+	let store: Storage;
+	let courses: any[] = [];
+	let courseID: string;
+	let registrations: any[] = [];
+	let strikes: any[] = [];
 	let showOverlay = false;
 	let loading = false;
 	let preRegisterName = '';
@@ -19,9 +19,9 @@
 	$: isLoggedIn = store && authHelper.authenticated(store);
 	$: token = store && store.getItem('id_token');
 	$: role =
-		store && JSON.parse(localStorage.getItem('profile'))['https://ausowa.netlify.app/role'][0];
+		store && JSON.parse(localStorage.getItem('profile')!)['https://ausowa.netlify.app/role'][0];
 
-	let headers = {};
+	let headers: HeadersInit = {};
 
 	onMount(async () => {
 		store = window.localStorage;
@@ -167,7 +167,9 @@
 			return;
 		}
 		loading = true;
-		await fetch(server + '/registration/clear-strike?regKey=' + encodeURIComponent(key), {headers}).then((j) => j.json());
+		await fetch(server + '/registration/clear-strike?regKey=' + encodeURIComponent(key), {
+			headers
+		}).then((j) => j.json());
 		await update();
 	}
 
@@ -373,10 +375,7 @@
 
 	div#overlay {
 		position: fixed;
-		top: 0;
-		bottom: 0;
-		right: 0;
-		left: 0;
+		inset: 0;
 		display: flex;
 		justify-content: center;
 		align-items: center;

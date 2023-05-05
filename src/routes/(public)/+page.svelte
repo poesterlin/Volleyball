@@ -1,13 +1,11 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { humanReadableDate } from '../helpers/date';
-	import { onMount } from 'svelte';
-	import RegisteredOverlay from '../components/registeredOverlay.svelte';
-	import Course from '../components/course.svelte';
-	import Loading from '../components/loading.svelte';
-	import { server } from '../helpers/env';
+	import { humanReadableDate } from '$lib/helpers/date';
+	import RegisteredOverlay from '$lib/components/registeredOverlay.svelte';
+	import Course from '$lib/components/course.svelte';
+	import Loading from '$lib/components/loading.svelte';
+	import { server } from '$lib/helpers/env';
 
-	let blocks = [];
 	let name: string;
 	let triedToSend = false;
 	let registration;
@@ -15,29 +13,9 @@
 	let showOverlay = false;
 	let loading = false;
 
-	onMount(async () => {
-		await update();
-	});
-
-	async function update() {
-		loading = true;
-		let { courses: res } = await fetch(server + '/courses').then((r) => r.json());
-
-		res.forEach((course) => {
-			course.date = new Date(course.date);
-		});
-
-		const dates = (res as any[]).reduce((map, c) => map.set(c.date.toDateString()), new Map());
-
-		blocks = Array.from(dates.keys()).map((date) => ({
-			date,
-			courses: res.filter((c) => c.date.toDateString() === date)
-		}));
-
-		loading = false;
-		if (blocks.flatMap((b) => b.courses).length === 1) {
-			courseID = blocks.flatMap((b) => b.courses)[0]._id;
-		}
+	export let data;
+	if (data.blocks?.flatMap((b) => b.courses).length === 1) {
+		courseID = data.blocks?.flatMap((b) => b.courses)[0]._id;
 	}
 
 	const minTextLength = 4;
@@ -63,10 +41,10 @@
 
 		localStorage.setItem('lastKey', res.registration.key);
 
-		const storedKeys = JSON.parse(localStorage.getItem('keys')) || [];
+		const storedKeys = JSON.parse(localStorage.getItem('keys')!) || [];
 		storedKeys.push({
 			key: res.registration.key,
-			date: blocks.flatMap((b) => b.courses).find((c) => c._id === courseID).date
+			date: data.blocks?.flatMap((b) => b.courses).find((c) => c._id === courseID)!.date
 		});
 		localStorage.setItem('keys', JSON.stringify(storedKeys));
 
@@ -89,14 +67,20 @@
 </script>
 
 <Loading {loading} />
-
 <main>
 	{#if !canSend && triedToSend}
 		<label class="red" for="name">Make sure to include your last name.</label>
 	{/if}
-	<input type="text" autocomplete="name" placeholder="Name" on:keyup={isEnter} name="name" bind:value={name} />
+	<input
+		type="text"
+		autocomplete="name"
+		placeholder="Name"
+		on:keyup={isEnter}
+		name="name"
+		bind:value={name}
+	/>
 	<div id="list">
-		{#each blocks as block, i}
+		{#each data.blocks ?? [] as block, i}
 			<span>{humanReadableDate(block.date)}</span>
 			{#each block.courses as course}
 				<Course
@@ -105,11 +89,11 @@
 					selected={course._id === courseID}
 				/>
 			{/each}
-			{#if i < blocks.length - 1}
+			{#if i < data.blocks?.length - 1}
 				<div class="line" />
 			{/if}
 		{/each}
-		{#if blocks.length === 0}There are currently no courses. ☹{/if}
+		{#if data.blocks?.length === 0}There are currently no courses. ☹{/if}
 	</div>
 
 	<button id="register" on:click={send} class:disabled={!canSend}>Register</button>
@@ -118,12 +102,7 @@
 	{/if}
 </main>
 
-<style lang="scss">
-	@use '../helpers/theme' as *;
-	@use 'sass:color';
-
-	$padding: 5px;
-
+<style>
 	span {
 		font-size: 14px;
 		font-weight: bold;
@@ -138,16 +117,16 @@
 		margin: 60px 20% 50px;
 		height: 2px;
 		opacity: 0.4;
-		background: linear-gradient(90deg, $c80 0%, $c40 50%, $c80 100%);
+		background: linear-gradient(90deg, var(--c80) 0%, var(--c40) 50%, var(--c80) 100%);
 	}
 
 	main {
 		display: flex;
 		flex-direction: column;
-		margin: 5vh auto;
+		margin: 5dvh auto 15dvh;
 		width: 90vw;
 		max-width: 700px;
-		min-height: 100vh;
+		box-sizing: border-box;
 	}
 
 	input {
@@ -156,7 +135,7 @@
 		margin: 0 0 20px 0;
 		padding: 5px;
 		border-radius: 10px;
-		border: 3px solid $cAccent;
+		border: 3px solid var(--cAccent);
 		height: 48px;
 	}
 
@@ -165,16 +144,22 @@
 	}
 
 	#list {
-		max-height: 40vh;
+		max-height: 50dvh;
 		overflow-y: auto;
 		margin-bottom: 4vh;
 	}
 
-	button {
+	@media screen and (max-height: 600px) {
+		#list {
+			max-height: 40dvh;
+		}
+	}
+
+	button#register {
 		display: block;
-		margin: 15px auto;
+		margin: 15px auto 30px;
 		padding: 1em 3em;
-		background: $cAccent;
+		background: var(--cAccent);
 		color: white;
 		border: 0;
 		border-radius: 80px;
@@ -184,9 +169,9 @@
 	}
 
 	button.disabled {
-		border: 2px solid $c40;
-		background-color: $c100;
-		color: $c80;
+		border: 2px solid var(--c40);
+		background-color: var(--c100);
+		color: var(--c80);
 		cursor: no-drop;
 		box-shadow: unset;
 	}
