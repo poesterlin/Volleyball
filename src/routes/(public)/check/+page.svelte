@@ -277,6 +277,7 @@
 					font-weight: normal;
 				}
 				span:nth-child(2) {
+					color: var(--c20);
 					font-weight: bold;
 				}
 			}
