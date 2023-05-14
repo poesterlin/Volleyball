@@ -34,13 +34,8 @@ export function humanReadableDate(date: Date | string) {
 	const weekday = Intl.DateTimeFormat('en-US', { weekday: 'long' }).format(comp);
 
 	if (Math.abs(days) < 4) {
-		let modifier = '';
-		if (isAfter(today, comp)) {
-			modifier = 'vor';
-		} else {
-			modifier = 'in';
-		}
-		return `${weekday}, ${modifier} ${Math.abs(days)} days`;
+		const past = isAfter(today, comp)
+		return `${weekday}, ${past ? "" : "in"} ${Math.abs(days)} days ${past ? "ago" : ""}`;
 	}
 
 	const weeks = differenceInCalendarISOWeeks(comp, today);
@@ -62,17 +57,11 @@ export function humanReadableDate(date: Date | string) {
 		return 'next week on ' + weekday;
 	}
 	if (Math.abs(weeks) < 4) {
-		let modifier = '';
-		if (isAfter(today, comp)) {
-			modifier = 'vor';
-		} else {
-			modifier = 'in';
-		}
 		const day = comp.toLocaleDateString('en-US', {
 			month: 'short',
 			day: 'numeric'
 		});
-		return `${modifier} ${Math.abs(weeks)} weeks (${day})`;
+		return `on ${day}`;
 	}
 
 	return comp.toLocaleDateString('en-US', {
