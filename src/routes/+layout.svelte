@@ -34,6 +34,7 @@
 		--breakpoint-sm: 576px;
 		--breakpoint-md: 768px;
 
+		overflow-x: hidden;
 		color: var(--c0);
 	}
 

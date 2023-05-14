@@ -144,7 +144,7 @@
 	}
 
 	#list {
-		max-height: 50dvh;
+		max-height: 48dvh;
 		overflow-y: auto;
 		margin-bottom: 4vh;
 	}

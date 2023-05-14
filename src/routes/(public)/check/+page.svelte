@@ -300,7 +300,9 @@
 	h3 {
 		font-weight: bold;
 	}
-
+	b {
+		color: var(--c100);
+	}
 	#waitlist {
 		display: flex;
 		flex-wrap: wrap;
