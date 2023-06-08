@@ -6,6 +6,7 @@
 	import authHelper from '$lib/helpers/auth-helper';
 	import Course from '$lib/components/course.svelte';
 	import CourseCreator from '$lib/components/createCourse.svelte';
+	import { startOfDay } from 'date-fns';
 
 	let store: Storage;
 	let courses: any[] = [];
@@ -91,6 +92,7 @@
 	}
 
 	async function createCourse({ detail }) {
+		detail.date = startOfDay(detail.date);
 		loading = true;
 		await fetch(server + '/courses', {
 			method: 'POST',

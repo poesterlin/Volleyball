@@ -10,6 +10,7 @@ export const load = (async () => {
 
         const sanitized = courses.map((c) => {
             const resp = c.toObject();
+            // @ts-ignore
             resp._id = c._id.toString();
             resp.registered = resp.registered.length as any;
             resp.date = new Date(c.date!);
