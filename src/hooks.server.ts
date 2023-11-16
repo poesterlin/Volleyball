@@ -1,14 +1,13 @@
-import type { Handle } from "@sveltejs/kit"
+import { redirect, type Handle } from "@sveltejs/kit";
+
+const cutoffDate = new Date("2023-11-18T10:00:00.000Z");
 
 export const handle: Handle = async ({ event, resolve }) => {
-    // if (event.url.pathname.startsWith("/admin")) {
-    //     event.locals.user = authenticateUser(event);
+    const isPastCutoff = new Date() > cutoffDate;
 
-    //     if (event.locals.user?.role !== "ADMIN") {
-    //         throw redirect(303, "/")
-    //     }
-    // }
-
+    if (isPastCutoff) {
+        throw redirect(301, "https://volleyball.oesterlin.dev");
+    }
 
     return resolve(event);
 }
