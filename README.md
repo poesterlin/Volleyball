@@ -2,6 +2,8 @@
 
 This Repo contains the code for an application created to manage registrations. It uses a serverless backend connected to a serverless MongoDB instance and a static frontend generated using SvelteKit. It has some publicly available options as well as authentication for administrators to access hidden management tools.
 
+This project has reached the end of its life and is no longer being maintained. It is being kept here for archival purposes. Check out the `archive` branch for the final version.
+
 ## Development
 
 To start a local development version of the frontend run:
